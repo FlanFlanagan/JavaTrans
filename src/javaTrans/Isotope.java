@@ -1,7 +1,6 @@
 package javaTrans;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -35,4 +34,6 @@ class Isotope {
 		}
 		lines.forEach(System.out::println);
 	}
+	
+	void 
 }

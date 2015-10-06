@@ -9,7 +9,7 @@ import java.util.stream.Stream;
 
 import org.jblas.DoubleMatrix;
 
-class Region {
+public class Region {
 	double xUpper;
 	double xLower;
 	
@@ -43,14 +43,19 @@ class Region {
 	double finalFF;
 	double fluxFF;
 	
-	void readIsos(){
+	public void readIsos(){
 		Stream<String> lines = null;
 		try {
-			lines = Files.lines(Paths.get("Isos.txt"), StandardCharsets.UTF_8);
+			lines = Files.lines(Paths.get("Isos/Isos.txt"), StandardCharsets.UTF_8);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		lines.forEach(System.out::println);
+		
+		String[] isos = (String[]) lines.toArray();
+		lines.count();
+		System.out.println(isos);
+		
 	}
 	
 }
