@@ -1,0 +1,14 @@
+# depslib dependency file v1.0
+1336994470 source:/home/robert/Desktop/Burn-up Code/Burn-up.cpp
+	<Eigen/Eigen>
+	<tr1/cmath>
+	<fstream>
+	<iostream>
+	<iomanip>
+	<string>
+	<vector>
+	<sstream>
+	<cstdlib>
+	<ctime>
+	<tr1/cmath>
+

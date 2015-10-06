@@ -1,0 +1,14 @@
+# depslib dependency file v1.0
+1384810658 source:/home/robert/Desktop/HoWork2/homework2.cpp
+	<Eigen/Eigen>
+	<tr1/cmath>
+	<fstream>
+	<iostream>
+	<iomanip>
+	<string>
+	<vector>
+	<sstream>
+	<cstdlib>
+	<ctime>
+	<tr1/cmath>
+
