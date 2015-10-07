@@ -1,11 +1,6 @@
 package javaTrans;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.stream.Stream;
 
 import org.jblas.DoubleMatrix;
 
@@ -19,8 +14,8 @@ public class Region {
 	double zUpper;
 	double zLower;
 	
-	ArrayList<Mesh> meshPoints;
-	ArrayList<Isotope> isos;
+	ArrayList<Mesh> meshPoints = new ArrayList<Mesh>();
+	ArrayList<Isotope> isos = new ArrayList<Isotope>();
 	
 	String regionType;
 	
@@ -29,33 +24,19 @@ public class Region {
 	double meshNumber;
 	
 	ArrayList<ArrayList<ArrayList<Double>>> sKernal;
-	ArrayList<Double> totalXS;
-	ArrayList<Double> absorbXS;
-	ArrayList<Double> scatterXS;
-	ArrayList<Double> chi;
+	ArrayList<Double> totalXS = new ArrayList<Double>();
+	ArrayList<Double> absorbXS = new ArrayList<Double>();
+	ArrayList<Double> scatterXS = new ArrayList<Double>();
+	ArrayList<Double> chi = new ArrayList<Double>();
 	DoubleMatrix fissionM;
 	
 	double totalC;
 	double absorbC;
 	double nuFissionC;
 	
-	ArrayList<Double> finalFlux;
+	ArrayList<Double> finalFlux = new ArrayList<Double>();
 	double finalFF;
 	double fluxFF;
 	
-	public void readIsos(){
-		Stream<String> lines = null;
-		try {
-			lines = Files.lines(Paths.get("Isos/Isos.txt"), StandardCharsets.UTF_8);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		lines.forEach(System.out::println);
-		
-		String[] isos = (String[]) lines.toArray();
-		lines.count();
-		System.out.println(isos);
-		
-	}
 	
 }
