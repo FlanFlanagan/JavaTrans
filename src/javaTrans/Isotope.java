@@ -53,7 +53,6 @@ class Isotope {
 		//removes any empty lines
 		for(int i = 0; i < strings.size(); i++){
 			strings.set(i, strings.get(i).trim().replaceAll("\\s+", " "));
-			strings.set(i, strings.get(i).replaceAll("\\+", ""));
 			if(strings.get(i).trim().equalsIgnoreCase("")){
 				strings.remove(i);
 				i--;
@@ -88,9 +87,11 @@ class Isotope {
 			if(tempStrings.length > 1){
 				this.totalXS.add(Double.parseDouble(tempStrings[1]));
 			} else {
+				Collections.reverse(this.totalXS);
 				return this.totalXS.size();
 			}
 		}
+		Collections.reverse(this.totalXS);
 		return this.totalXS.size();
 	}
 	

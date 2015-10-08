@@ -1,6 +1,8 @@
 package javaTrans;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.jblas.DoubleMatrix;
 
@@ -16,7 +18,7 @@ public class Region {
 	
 	ArrayList<Mesh> meshPoints = new ArrayList<Mesh>();
 	ArrayList<Isotope> isos = new ArrayList<Isotope>();
-	
+	Map<Integer, Double> isotopes = new HashMap<Integer, Double>();	
 	String regionType;
 	
 	double maxMesh;
