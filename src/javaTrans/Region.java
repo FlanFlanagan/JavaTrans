@@ -20,7 +20,7 @@ public class Region {
 	ArrayList<Isotope> isos = new ArrayList<Isotope>();
 	Map<Integer, Double> isotopes = new HashMap<Integer, Double>();	
 	String regionType;
-	
+	int fissileNumber = 0;
 	double maxMesh;
 	double meshSize;
 	double meshNumber;
@@ -30,7 +30,6 @@ public class Region {
 	ArrayList<Double> absorbXS = new ArrayList<Double>();
 	ArrayList<Double> scatterXS = new ArrayList<Double>();
 	ArrayList<Double> chi = new ArrayList<Double>();
-	DoubleMatrix fissionM;
 	
 	double totalC;
 	double absorbC;
@@ -40,5 +39,82 @@ public class Region {
 	double finalFF;
 	double fluxFF;
 	
+	Region(double xLow, double xUp, String type, ArrayList<Isotope> projectIsos, Constants conts){
+		this.xLower = xLow;
+		this.xUpper = xUp;
+		this.regionType = type;
+	}
 	
+	void sumFissile(ArrayList<Isotope> projectIsos){
+		for(Isotope iso:projectIsos){
+			if(isotopes.containsKey(iso.name)){
+				if(iso.fissile){
+					fissileNumber += 1;
+				}
+			}
+		}
+	}
+	
+	void buildTotal(ArrayList<Isotope> projectIsos){
+		for(Isotope iso: projectIsos){
+			if(isotopes.containsKey(iso.name)){
+				for(int i = 0; i < iso.eBins; i++){
+					this.totalXS.set(i, (this.totalXS.get(i) + (isotopes.get(iso.name) * iso.totalXS.get(i))));
+				}	
+			}
+		}
+	}
+	
+	void buildChi(ArrayList<Isotope> projectIsos){
+		for(Isotope iso: projectIsos){
+			if(isotopes.containsKey(iso.name)){
+				for(int i = 0; i < iso.eBins; i++){
+					this.chi.set(i, (this.chi.get(i) + (this.isotopes.get(iso.name)/this.fissileNumber * iso.chi.get(i))));
+				}	
+			}
+		}
+	}
+
+	void buildSkernal(ArrayList<Isotope> projectIsos){
+		for(Isotope iso: projectIsos){
+			if(isotopes.containsKey(iso.name)){
+				for(int i = 0; i < iso.eBins; i++){
+					for(int j = 0; j < iso.eBins; j++){
+						for(int lgdr = 0; lgdr < iso.legdrNum; lgdr ++){
+							this.sKernal.get(i).get(j).set(lgdr, this.sKernal.get(i).get(j).get(lgdr) + (this.isotopes.get(iso.name) * iso.sKernal.get(i).get(j).get(lgdr)));
+						}
+					}
+				}	
+			}
+		}
+	}
+	
+	void buildScatter(ArrayList<Isotope> projectIsos){
+		for(Isotope iso: projectIsos){
+			if(isotopes.containsKey(iso.name)){
+				for(int i = 0; i < iso.eBins; i++){
+					this.scatterXS.set(i, (this.scatterXS.get(i) + (this.isotopes.get(iso.name) * iso.scatterXS.get(i))));
+				}	
+			}
+		}
+	}
+	
+	void buildAbsorb(ArrayList<Isotope> projectIsos){
+		for(Isotope iso: projectIsos){
+			if(isotopes.containsKey(iso.name)){
+				for(int i = 0; i < iso.eBins; i++){
+					this.absorbXS.set(i, (this.absorbXS.get(i) + (this.isotopes.get(iso.name) * iso.absorbXS.get(i))));
+				}	
+			}
+		}
+	}
+	
+	void calcMaxXS(){
+		double maxXS = this.totalXS.get(0);
+		for(int i = 0; i < this.totalXS.size(); i++){
+			if(this.totalXS.get(i) > maxXS){
+				maxXS = this.totalXS.get(i);
+			}
+		}
+	}
 }

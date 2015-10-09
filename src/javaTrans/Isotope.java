@@ -11,9 +11,9 @@ import java.util.stream.Stream;
 
 class Isotope {
 	int name;
-	double numDen;
 	int eBins;
 	int legdrNum;
+	boolean fissile;
 	
 	ArrayList<Double> chi = new ArrayList<Double>();
 	ArrayList<Double> nuFission = new ArrayList<Double>();
@@ -31,7 +31,6 @@ class Isotope {
 	
 	
 	Isotope(String string){
-		this.numDen = Double.parseDouble(string.split(" ")[1]);
 		this.name = Integer.parseInt(string.split(" ")[0]);
 		readIsoInformation();
 	}
@@ -154,6 +153,22 @@ class Isotope {
 				while(this.sKernal.get(k).get(j).size() < this.legdrNum){
 					this.sKernal.get(k).get(j).add(0.);
 				}
+			}
+		}
+	}
+	
+	void buildScatter(){
+		for(int i = 0; i < this.eBins; i++){
+			for(int j = 0; j < this.eBins; j++){
+				this.scatterXS.set(i, this.scatterXS.get(i) + this.sKernal.get(j).get(i).get(0));
+			}
+		}
+	}
+	
+	void buildAbsorb(){
+		for(int i = 0; i < this.eBins; i++){
+			for(int j = 0; j < this.eBins; j++){
+				this.absorbXS.set(i, this.totalXS.get(i) - this.scatterXS.get(i));
 			}
 		}
 	}
