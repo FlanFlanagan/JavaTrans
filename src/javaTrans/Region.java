@@ -24,6 +24,7 @@ public class Region {
 	double maxMesh;
 	double meshSize;
 	double meshNumber;
+	double maxXS;
 	
 	ArrayList<ArrayList<ArrayList<Double>>> sKernal;
 	ArrayList<Double> totalXS = new ArrayList<Double>();
@@ -43,6 +44,11 @@ public class Region {
 		this.xLower = xLow;
 		this.xUpper = xUp;
 		this.regionType = type;
+		
+		this.sumFissile(projectIsos);
+		this.buildXS(projectIsos);
+		
+		this.buildMesh(conts);
 	}
 	
 	void sumFissile(ArrayList<Isotope> projectIsos){
@@ -109,12 +115,43 @@ public class Region {
 		}
 	}
 	
+	void buildXS(ArrayList<Isotope> projectIsos){
+		this.buildTotal(projectIsos);
+		this.buildChi(projectIsos);
+		this.buildScatter(projectIsos);
+		this.buildSkernal(projectIsos);
+		this.buildAbsorb(projectIsos);
+	}
+	
 	void calcMaxXS(){
-		double maxXS = this.totalXS.get(0);
+		this.maxXS = this.totalXS.get(0);
 		for(int i = 0; i < this.totalXS.size(); i++){
 			if(this.totalXS.get(i) > maxXS){
-				maxXS = this.totalXS.get(i);
+				this.maxXS = this.totalXS.get(i);
 			}
 		}
+	}
+	
+	void calcMaxMesh(Constants conts){
+		this.maxMesh = (2 * (1/this.maxXS) * conts.minMew);
+	}
+	
+	void calcMeshSize(){
+		this.meshSize = this.xUpper - this.xLower;
+		while(this.meshSize > this.maxMesh){
+			meshSize /= 2;
+		}
+	}
+	
+	void buildMesh(Constants conts){
+		while(this.meshPoints.size() < this.meshNumber){
+			this.meshPoints.add(new Mesh(conts));
+		}
+	}
+	
+	void buildMeshValues(Constants conts){
+		this.calcMaxXS();
+		this.calcMaxMesh(conts);
+		this.calcMeshSize();
 	}
 }

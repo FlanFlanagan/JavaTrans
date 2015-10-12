@@ -4,6 +4,8 @@ import java.util.ArrayList;
 
 public class Constants {
 	int ordinates = 2;
+	int dimensions = 1;
+	int groups = 10; /** TODO have this derive from Isotopes */
 	double convergence = 0.005;
 	int legendre = 9;
 	
