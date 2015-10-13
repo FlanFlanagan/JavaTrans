@@ -145,7 +145,7 @@ public class Region {
 	
 	void buildMesh(Constants conts){
 		while(this.meshPoints.size() < this.meshNumber){
-			this.meshPoints.add(new Mesh(conts));
+			this.meshPoints.add(new Mesh(conts, this.meshSize, this.meshPoints.size()));
 		}
 	}
 	

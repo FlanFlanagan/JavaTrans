@@ -7,5 +7,7 @@ public class Main {
 		ArrayList<Isotope> projectIsos = new ArrayList<Isotope>();
 		IsoReader.readIsos(projectIsos);
 		Constants Conts = new Constants();
+		
+		
 	}
 }

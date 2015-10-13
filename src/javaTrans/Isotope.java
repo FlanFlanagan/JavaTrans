@@ -9,11 +9,14 @@ import java.util.Collections;
 import java.util.Vector;
 import java.util.stream.Stream;
 
+import com.sun.javafx.logging.Logger;
+
 class Isotope {
+	
 	int name;
 	int eBins;
 	int legdrNum;
-	boolean fissile;
+	boolean fissile = false;
 	
 	ArrayList<Double> chi = new ArrayList<Double>();
 	ArrayList<Double> nuFission = new ArrayList<Double>();
@@ -32,7 +35,12 @@ class Isotope {
 	
 	Isotope(String string){
 		this.name = Integer.parseInt(string.split(" ")[0]);
+		System.out.println("Building Isotope information for: " + this.name);
+		if(Integer.parseInt(string.split(" ")[2]) == 0){
+			this.fissile = true;
+		}
 		readIsoInformation();
+		System.out.println("Finished building Isotope information for: " + this.name);
 	}
 	
 	void readIsoInformation(){
@@ -87,6 +95,7 @@ class Isotope {
 				this.totalXS.add(Double.parseDouble(tempStrings[1]));
 			} else {
 				Collections.reverse(this.totalXS);
+				System.out.println("Total length: " + this.totalXS.size());
 				return this.totalXS.size();
 			}
 		}
@@ -108,6 +117,9 @@ class Isotope {
 	}
 	
 	void readChi(Vector<String> strings, int i){
+		if(strings.get(i).trim().equalsIgnoreCase("nufission")){
+			return;
+		}
 		int limit = i + eBins;
 		for(;i < limit; i++){
 			String[] tempStrings = strings.get(i).split(" ");
@@ -117,6 +129,9 @@ class Isotope {
 	}
 	
 	void readNuFission(Vector<String> strings, int i){
+		if(strings.get(i).trim().equalsIgnoreCase("skernel")){
+			return;
+		}
 		int limit = i + eBins;
 		for(;i < limit; i++){
 			String[] tempStrings = strings.get(i).split(" ");
