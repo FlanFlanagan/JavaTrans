@@ -19,9 +19,11 @@ public class IsoReader {
 		}
 		Vector<String> strings = new Vector<String>();
 		lines.forEach((line) -> strings.add(line));
+		
 	}
 	
-	public static void buildProblem(ArrayList<Isotope> isoArray, Vector<String> strings){
-		
+	public static void buildProblem(ArrayList<Isotope> isoArray, String string){
+		Isotope iso = new Isotope(string);
+		isoArray.add(iso);
 	}
 }
