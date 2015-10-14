@@ -1,0 +1,37 @@
+ moder
+ 20 -21
+ reconr
+ -21 -22
+ 'pendf tape for u-233'/
+ MAT1 3/
+ .005/
+ '92-u-233 from endf/b-vi'/
+ 'processed by the njoy nuclear data processing system'/
+ 'see original endf/b-vi tape for details of evaluation'/
+ 0/
+ broadr
+ -21 -22 -23
+ MAT1 NTEMP2 0 1 TEMP1/
+ .005/
+ TEMP2
+ 0/
+ unresr
+ -21 -23 -24
+ MAT NTEMP NSIGZ 1/
+ TEMP
+ SIGZ
+ 0/
+ groupr
+ 20 -24 0 -25/
+ MAT 1 0 IWT LORD NTEMP NSIGZ/
+ 'u-233 total and fission xs and scattering kernel'/
+ TEMP/
+ SIGZ/
+ NGN/
+ EGN/
+ MF MT/
+ 0/
+ 0/
+ moder
+ -25 28
+ stop
