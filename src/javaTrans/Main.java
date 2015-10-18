@@ -4,10 +4,10 @@ import java.util.ArrayList;
 
 public class Main {
 	public static void main(String[] args){
+		Constants conts = new Constants();
 		ArrayList<Isotope> projectIsos = new ArrayList<Isotope>();
-		IsoReader.readIsos(projectIsos);
-		Constants Conts = new Constants();
-		
-		
+		ArrayList<Region> regions = new ArrayList<Region>();
+		ProjectBuilder.buildProblem(projectIsos, regions, conts);
+		System.out.println("Done.");
 	}
 }

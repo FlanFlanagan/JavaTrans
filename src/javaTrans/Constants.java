@@ -9,6 +9,7 @@ public class Constants {
 	double convergence = 0.005;
 	int legendre = 9;
 	double source = 100000.;
+	int eBins;
 	
 	
 	ArrayList<Double> mew = new ArrayList<Double>();

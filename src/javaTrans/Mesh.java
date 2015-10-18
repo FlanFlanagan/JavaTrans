@@ -18,10 +18,10 @@ class Mesh {
 	double zPosition;
 	double zInt;
 	
-	ArrayList<ArrayList<ArrayList<Double>>> sourceTerm;
-	ArrayList<ArrayList<ArrayList<ArrayList<Double>>>> flux;
-	ArrayList<ArrayList<ArrayList<ArrayList<Double>>>> fluxTotal;
-	ArrayList<ArrayList<ArrayList<ArrayList<Double>>>> fluxPTotal;
+	ArrayList<ArrayList<ArrayList<Double>>> sourceTerm = new ArrayList<ArrayList<ArrayList<Double>>>();
+	ArrayList<ArrayList<ArrayList<ArrayList<Double>>>> flux = new ArrayList<ArrayList<ArrayList<ArrayList<Double>>>>();
+	ArrayList<ArrayList<ArrayList<ArrayList<Double>>>> fluxTotal = new ArrayList<ArrayList<ArrayList<ArrayList<Double>>>>();
+	ArrayList<ArrayList<ArrayList<ArrayList<Double>>>> fluxPTotal = new ArrayList<ArrayList<ArrayList<ArrayList<Double>>>>();
 	ArrayList<Double> energyFlux;
 	double FinalFlux;
 	
