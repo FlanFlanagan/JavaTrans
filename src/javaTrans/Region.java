@@ -133,7 +133,7 @@ public class Region {
 	}
 	
 	void calcMaxMesh(Constants conts){
-		this.maxMesh = (2 * (1/this.maxXS*1E24) * conts.minMew);
+		this.maxMesh = (2 * (1/this.maxXS) * conts.minMew);
 	}
 	
 	void calcMeshSize(){
@@ -182,11 +182,73 @@ public class Region {
 		}
 	}
 
-	public void printinfo() {
+	void printinfo() {
 		System.out.println("PRINTING REGION INFORMATION");
 		System.out.println("X start: " + this.xLower + "X end: " + this.xUpper);
 		System.out.println("Region Type: " + this.regionType);
 		System.out.println("Fissile Number Density: " + this.fissileNumDen);
 		System.out.println(this.meshNumber + " mesh points of " + this.meshSize + "cm");
+	}
+	
+	void sweepRight(Constants conts){
+		for(int m = 0; m < this.meshNumber; m++){
+			for(int mew = 0; mew < conts.mew.size()/2; mew++){
+				for(int e = 0; e < conts.eBins; e++){
+					calcFluxCenterXR(m, mew, e, conts);
+					calcFluxRightX(m, mew, e, conts);
+					for(int edge = 0; edge < conts.edges; edge++){
+						this.meshPoints.get(m).fluxTotal.get(edge).get(0).get(mew).set(e, this.meshPoints.get(m).fluxTotal.get(edge).get(0).get(mew).get(e) + this.meshPoints.get(m).flux.get(edge).get(0).get(mew).get(e));
+					}
+				}
+			}
+		}
+	}
+	
+	void sweepLeft(Constants conts){
+		for(int m = 0; m < this.meshNumber; m++){
+			for(int mew = conts.mew.size()/2; mew < conts.mew.size(); mew++){
+				for(int e = 0; e < conts.eBins; e++){
+					calcFluxCenterXL(m, mew, e, conts);
+					calcFluxLeftX(m, mew, e, conts);
+					for(int edge = 0; edge < conts.edges; edge++){ 	
+						this.meshPoints.get(m).fluxTotal.get(edge).get(0).get(mew).set(e, this.meshPoints.get(m).fluxTotal.get(edge).get(0).get(mew).get(e) + this.meshPoints.get(m).flux.get(edge).get(0).get(mew).get(e));
+					}
+				}
+			}
+		}
+	}
+	
+	void calcFluxCenterXR(int m, int mew, int e, Constants conts){
+		double left = this.meshSize * this.meshPoints.get(m).sourceTerm.get(0).get(mew).get(e);
+		double mewNum = 2 * conts.mew.get(mew) * this.meshPoints.get(m).flux.get(0).get(0).get(mew).get(e);
+		double denom = 2 * (conts.mew.get(mew) + this.meshSize * this.totalXS.get(e));
+		this.meshPoints.get(m).flux.get(1).get(0).get(mew).set(e, (left + mewNum) / denom);
+	}
+	
+	void calcFluxCenterXL(int m, int mew, int e, Constants conts){
+		double left = this.meshSize * this.meshPoints.get(m).sourceTerm.get(0).get(mew).get(e);
+		double mewNum = 2 * conts.mew.get(mew) * this.meshPoints.get(m).flux.get(2).get(0).get(mew).get(e);
+		double denom = -2 * (conts.mew.get(mew) + this.meshSize * this.totalXS.get(e));
+		this.meshPoints.get(m).flux.get(1).get(0).get(mew).set(e, (left - mewNum) / denom);
+	}
+	
+	void calcFluxRightX(int m, int mew, int e, Constants conts){
+		/*double left = 2*this.meshPoints.get(m).flux.get(1).get(0).get(mew).get(e);
+		double right = this.meshPoints.get(m).flux.get(0).get(0).get(mew).get(e);
+		this.meshPoints.get(m).flux.get(2).get(0).get(mew).set(e, ((2 * left) - right));*/
+		this.meshPoints.get(m).flux.get(2).get(0).get(mew).set(e, ((2*this.meshPoints.get(m).flux.get(1).get(0).get(mew).get(e)) - this.meshPoints.get(m).flux.get(0).get(0).get(mew).get(e)));
+	}
+	
+	void calcFluxLeftX(int m, int mew, int e, Constants conts){
+		/*double left = 2*this.meshPoints.get(m).flux.get(1).get(0).get(mew).get(e);
+		double right = this.meshPoints.get(m).flux.get(2).get(0).get(mew).get(e);
+		this.meshPoints.get(m).flux.get(0).get(0).get(mew).set(e, ((2 * left) - right));*/
+		this.meshPoints.get(m).flux.get(0).get(0).get(mew).set(e, ((2*this.meshPoints.get(m).flux.get(1).get(0).get(mew).get(e)) - this.meshPoints.get(m).flux.get(2).get(0).get(mew).get(e)));		
+	}
+		
+	void sourceZero(){
+		for(Mesh mesh: this.meshPoints){
+			mesh.zeroSource();
+		}
 	}
 }

@@ -58,7 +58,7 @@ public class ProjectBuilder {
 		while(!strings.get(i).equalsIgnoreCase("region end")){
 			int isoNumber = Integer.parseInt(strings.get(i).split(" ")[0]);
 			double numDensity = Double.parseDouble(strings.get(i).split(" ")[1]);
-			isoNumDens.put(isoNumber, numDensity);
+			isoNumDens.put(isoNumber, numDensity*1E-24);
 			i++;
 		}
 		return i;
