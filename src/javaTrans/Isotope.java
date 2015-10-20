@@ -15,6 +15,7 @@ class Isotope {
 	int eBins;
 	int legdrNum;
 	boolean fissile = false;
+	boolean background = false;
 	
 	ArrayList<Double> chi = new ArrayList<Double>();
 	ArrayList<Double> nuFission = new ArrayList<Double>();
@@ -34,10 +35,15 @@ class Isotope {
 	Isotope(String string){
 		this.name = Integer.parseInt(string.split(" ")[0]);
 		System.out.println("Building Isotope information for: " + this.name);
-		if(Integer.parseInt(string.split(" ")[2]) == 0){
+		readIsoInformation();
+		if(nuFission.size() > 0){
 			this.fissile = true;
 		}
-		readIsoInformation();
+		if(Integer.parseInt(string.split(" ")[1]) == 1){
+			this.background = true;
+		}
+		buildScatter();
+		buildAbsorb();
 		System.out.println("Finished building Isotope information for: " + this.name);
 	}
 	
@@ -172,6 +178,9 @@ class Isotope {
 	
 	void buildScatter(){
 		for(int i = 0; i < this.eBins; i++){
+			this.scatterXS.add(0.);
+		}
+		for(int i = 0; i < this.eBins; i++){
 			for(int j = 0; j < this.eBins; j++){
 				this.scatterXS.set(i, this.scatterXS.get(i) + this.sKernal.get(j).get(i).get(0));
 			}
@@ -180,6 +189,9 @@ class Isotope {
 	
 	void buildAbsorb(){
 		for(int i = 0; i < this.eBins; i++){
+			this.absorbXS.add(0.);
+		}
+		for(int i = 0; i < this.eBins; i++){
 			for(int j = 0; j < this.eBins; j++){
 				this.absorbXS.set(i, this.totalXS.get(i) - this.scatterXS.get(i));
 			}
@@ -187,6 +199,7 @@ class Isotope {
 	}
 	
 	void printInfo(){
+		System.out.println("\nISOTOPE INFORMATION FOR " + this.name);
 		System.out.println("TOTAL: " + this.totalXS);
 		System.out.println("CHI: " + this.chi);
 		System.out.println("NUFISSION: " + this.nuFission);
@@ -201,5 +214,7 @@ class Isotope {
 			}
 			System.out.print('\n');
 		}
+		System.out.println(this.name + " fissionable status: " + this.fissile);
+		System.out.println(this.name + " background status: " + this.background + "\n");
 	}
 }

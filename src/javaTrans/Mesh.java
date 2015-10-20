@@ -18,10 +18,10 @@ class Mesh {
 	double zPosition;
 	double zInt;
 	
-	ArrayList<ArrayList<ArrayList<Double>>> sourceTerm;
-	ArrayList<ArrayList<ArrayList<ArrayList<Double>>>> flux;
-	ArrayList<ArrayList<ArrayList<ArrayList<Double>>>> fluxTotal;
-	ArrayList<ArrayList<ArrayList<ArrayList<Double>>>> fluxPTotal;
+	ArrayList<ArrayList<ArrayList<Double>>> sourceTerm = new ArrayList<ArrayList<ArrayList<Double>>>();
+	ArrayList<ArrayList<ArrayList<ArrayList<Double>>>> flux = new ArrayList<ArrayList<ArrayList<ArrayList<Double>>>>();
+	ArrayList<ArrayList<ArrayList<ArrayList<Double>>>> fluxTotal = new ArrayList<ArrayList<ArrayList<ArrayList<Double>>>>();
+	ArrayList<ArrayList<ArrayList<ArrayList<Double>>>> fluxPTotal = new ArrayList<ArrayList<ArrayList<ArrayList<Double>>>>();
 	ArrayList<Double> energyFlux;
 	double FinalFlux;
 	
@@ -51,7 +51,7 @@ class Mesh {
 					ArrayList<Double> binsFlux = new ArrayList<Double>();
 					for(int bin = 0; bin < conts.groups; bin++){
 						binsCurrent.add(0.);
-						binsOld.add(0.);
+						binsOld.add(10000.);
 						binsFlux.add(0.);
 					}
 					sidesCurrent.add(binsCurrent);
@@ -79,6 +79,33 @@ class Mesh {
 				sourceCurrent.add(binsCurrent);
 			}
 			this.sourceTerm.add(sourceCurrent);	
+		}
+	}
+	
+	void zeroSource(){
+		for(int i = 0; i < this.sourceTerm.size(); i++){
+			for(int j = 0; j < this.sourceTerm.get(i).size(); j++){
+				for(int k = 0; k < this.sourceTerm.get(i).get(j).size(); k++){
+					this.sourceTerm.get(i).get(j).set(k, 0.);
+				}
+			}
+		}
+	}
+	
+	void calcScatter(Constants conts){
+		for(int m = 0; m < conts.mew.size(); m++){
+			for(int e = 0; e < conts.eBins; e++){
+				for(int l = 0; l < conts.legendre; l++){
+					for(int e2 = 0; e2 < conts.eBins; e2++){
+						for(int m2 = 0; m2 < conts.eBins; m2++){
+							double leg = 0.5 * (2 * l + 1) ;
+							this.sourceTerm.get(0).get(m).set(e, this.sourceTerm.get(0).get(m).get(e) + )
+							
+							//REGIONS[si].meshpoints[imesh].source[0][0][mew1][eng] = REGIONS[si].meshpoints[imesh].source[0][0][mew1][eng] + (0.5)*((2*l+1)*tr1::legendre(l, mew[mew1]))*(REGIONS[si].SKERNAL[eng][i][l])*(Wmew[mew2]*tr1::legendre(l, mew[mew2]) * REGIONS[si].meshpoints[imesh].flux[1][0][0][mew2][i]);
+						}
+					}
+				}
+			}
 		}
 	}
 }

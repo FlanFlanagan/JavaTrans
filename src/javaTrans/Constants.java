@@ -8,7 +8,9 @@ public class Constants {
 	int groups = 10; /** TODO have this derive from Isotopes */
 	double convergence = 0.005;
 	int legendre = 9;
+	int edges = 3;
 	double source = 100000.;
+	int eBins;
 	
 	
 	ArrayList<Double> mew = new ArrayList<Double>();
