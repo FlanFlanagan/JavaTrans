@@ -9,8 +9,7 @@ import java.util.Vector;
 import java.util.stream.Stream;
 
 public class IsoReader {
-	
-	public static void readIsos(ArrayList<Isotope> isoArray){
+	public void readIsos(ArrayList<Isotope> isoArray){
 		Stream<String> lines = null;
 		try {
 			lines = Files.lines(Paths.get("Isos/Isos.txt"), StandardCharsets.UTF_8);
@@ -22,8 +21,21 @@ public class IsoReader {
 		
 	}
 	
-	public static void buildProblem(ArrayList<Isotope> isoArray, String string){
-		Isotope iso = new Isotope(string);
-		isoArray.add(iso);
+	public static void buildProblem(Vector<String> strings){
+		for(int i = 0; i < strings.size(); i++){
+			strings.set(i, strings.get(i).trim().replaceAll("\\s+", " "));
+			if(strings.get(i).trim().equalsIgnoreCase("")){
+				strings.remove(i);
+				i--;
+			}
+		}
+		for(int i = 0; i < strings.size(); i++){
+			if(strings.get(i).equalsIgnoreCase("")){
+			}
+			switch (strings.get(i).toLowerCase()){
+			default:
+				break;
+			}
+		}
 	}
 }

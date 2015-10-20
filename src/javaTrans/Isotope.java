@@ -9,8 +9,6 @@ import java.util.Collections;
 import java.util.Vector;
 import java.util.stream.Stream;
 
-import com.sun.javafx.logging.Logger;
-
 class Isotope {
 	
 	int name;

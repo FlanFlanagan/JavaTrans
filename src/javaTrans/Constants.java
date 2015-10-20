@@ -21,6 +21,7 @@ public class Constants {
 			this.add(-0.5774);
 		}
 	};
+	
 	ArrayList<Double> wew2 = new ArrayList<Double>(){
 		{
 			this.add(1.);
