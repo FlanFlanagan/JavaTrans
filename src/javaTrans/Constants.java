@@ -3,13 +3,13 @@ package javaTrans;
 import java.util.ArrayList;
 
 public class Constants {
-	int ordinates = 2;
+	int ordinates = 8;
 	int dimensions = 1;
 	int groups = 10; /** TODO have this derive from Isotopes */
-	double convergence = 0.005;
+	double convergence = 0.001;
 	int legendre = 9;
 	int edges = 3;
-	double source = 100000.;
+	double source = 0.;
 	int eBins;
 	
 	

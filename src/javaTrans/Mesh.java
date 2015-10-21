@@ -28,7 +28,7 @@ class Mesh {
 	ArrayList<ArrayList<ArrayList<ArrayList<Double>>>> flux = new ArrayList<ArrayList<ArrayList<ArrayList<Double>>>>();
 	ArrayList<ArrayList<ArrayList<ArrayList<Double>>>> fluxTotal = new ArrayList<ArrayList<ArrayList<ArrayList<Double>>>>();
 	ArrayList<ArrayList<ArrayList<ArrayList<Double>>>> fluxPTotal = new ArrayList<ArrayList<ArrayList<ArrayList<Double>>>>();
-	ArrayList<Double> energyFlux;
+	ArrayList<Double> energyFlux = new ArrayList<Double>();
 	double FinalFlux;
 	
 	
@@ -58,7 +58,7 @@ class Mesh {
 					ArrayList<Double> binsFlux = new ArrayList<Double>();
 					for(int bin = 0; bin < conts.groups; bin++){
 						binsCurrent.add(0.);
-						binsOld.add(10000.);
+						binsOld.add(0.);
 						binsFlux.add(0.);
 					}
 					sidesCurrent.add(binsCurrent);
@@ -131,6 +131,10 @@ class Mesh {
 		}
 	}
 	
+	void setSource(int mew, int e, double flux){
+		this.sourceTerm.get(0).get(mew).set(e, flux);
+	}
+	
 	void calcScatter(Constants conts){
 		for(int m = 0; m < conts.mew.size(); m++){
 			for(int e = 0; e < conts.eBins; e++){
@@ -164,7 +168,7 @@ class Mesh {
 		return true;
 	}
 	
-	void sumTotalFlux(){
+	void sumTotalEFlux(){
 		for(int e = 0; e < region.conts.eBins; e++){
 			double totalEFlux = 0;
 			for(int m = 0; m < region.conts.mew.size(); m++){
@@ -172,5 +176,13 @@ class Mesh {
 			}
 			this.energyFlux.add(totalEFlux);
 		}
+	}
+	
+	void sumTotalFlux(){
+		double total = 0;
+		for(int e = 0; e < this.energyFlux.size(); e++){
+			total += this.energyFlux.get(e);
+		}
+		System.out.println(this.xPosition + " : " + total);
 	}
 }
