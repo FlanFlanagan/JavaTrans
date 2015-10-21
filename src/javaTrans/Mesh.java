@@ -29,8 +29,8 @@ class Mesh {
 	ArrayList<ArrayList<ArrayList<ArrayList<Double>>>> fluxTotal = new ArrayList<ArrayList<ArrayList<ArrayList<Double>>>>();
 	ArrayList<ArrayList<ArrayList<ArrayList<Double>>>> fluxPTotal = new ArrayList<ArrayList<ArrayList<ArrayList<Double>>>>();
 	ArrayList<Double> energyFlux = new ArrayList<Double>();
+	Double[][][] sourceTArray;
 	double FinalFlux;
-	
 	
 	Mesh(Constants conts, double size, int xPos, Region region){
 		/**TODO double check the ArrayLists here. It might be easier to just store i-1/2, i, 1+1/2 */
@@ -41,6 +41,15 @@ class Mesh {
 		this.xPosition = this.xLower + size / 2.;
 		this.xUpper = this.xLower + size;
 		this.region = region;
+	}
+	
+	void adlk(){
+		for(int i = 0, si = this.sourceTerm.size(); i < si; i++){
+			for(int j = 0, ji = this.sourceTerm.get(i).size(); j < ji; j++){
+				Double[] tempArray = (Double[]) this.sourceTerm.get(i).get(j).toArray();
+				this.sourceTArray[i][j] = tempArray;
+			}
+		}
 	}
 	
 	void buildFluxes(Constants conts){
@@ -171,7 +180,7 @@ class Mesh {
 	void sumTotalEFlux(){
 		for(int e = 0; e < region.conts.eBins; e++){
 			double totalEFlux = 0;
-			for(int m = 0; m < region.conts.mew.size(); m++){
+			for(int m = 0, mew = region.conts.mew.size(); m < mew; m++){
 				totalEFlux += this.fluxTotal.get(1).get(0).get(m).get(e);
 			}
 			this.energyFlux.add(totalEFlux);
@@ -180,7 +189,7 @@ class Mesh {
 	
 	void sumTotalFlux(){
 		double total = 0;
-		for(int e = 0; e < this.energyFlux.size(); e++){
+		for(int e = 0, etot = this.energyFlux.size(); e < etot; e++){
 			total += this.energyFlux.get(e);
 		}
 		System.out.println(this.xPosition + " : " + total);

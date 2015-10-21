@@ -17,7 +17,7 @@ public class Main {
 			regions.get(0).sweepLeft();
 			regions.get(0).sweepRight();
 			regions.get(0).sourceCalc();
-			if(count == 180){
+			if(count == 2){
 				System.out.println(count);
 				//System.out.println("Iterations over 100, stopping simulation");
 				break;
@@ -30,6 +30,7 @@ public class Main {
 			regions.get(0).meshPoints.get(i).sumTotalEFlux();
 			regions.get(0).meshPoints.get(i).sumTotalFlux();
 		}
+		regions.get(0).meshPoints.get(0).adlk();
 		System.out.println("Done. Finished run in: " + String.valueOf((time2-time1)/1E9) + " seconds");
 	}
 }
