@@ -236,4 +236,8 @@ class Mesh {
 		}
 		System.out.println(this.xPosition + " : " + total);
 	}
+	
+	void printEFlux(int e){
+		System.out.println(this.xPosition + " : " + this.energyFlux.get(e));
+	}
 }

@@ -28,14 +28,15 @@ public class Main {
 			for(int i = 0; i < regions.size(); i++){
 				regions.get(i).sourceCalc();
 			}
-			count++;
+			//count++;
 			System.out.println(count);
 		}
 		double time2 = System.nanoTime();
 		for(Region reg: regions){
 			for(int i = 0; i < reg.meshPoints.size(); i++){
 				reg.meshPoints.get(i).sumTotalEFlux();
-				reg.meshPoints.get(i).sumTotalFlux();
+				//reg.meshPoints.get(i).sumTotalFlux();
+				reg.meshPoints.get(i).printEFlux(0);
 			}
 		}
 		System.out.println("Done. Finished run in: " + String.valueOf((time2-time1)/1E9) + " seconds and interations = " + count);
