@@ -136,11 +136,11 @@ class Mesh {
 	}
 	
 	void calcScatter(Constants conts){
-		for(int m = 0; m < conts.mew.size(); m++){
+		for(int m = 0, mew = conts.mew.size(); m < mew; m++){
 			for(int e = 0; e < conts.eBins; e++){
 				for(int l = 0; l < conts.legendre; l++){
 					for(int e2 = 0; e2 < conts.eBins; e2++){
-						for(int m2 = 0; m2 < conts.mew.size(); m2++){
+						for(int m2 = 0; m2 < mew; m2++){
 							/*double leg1 = 0.5 * (2 * l + 1) * Legendre.evaluate(l, conts.mew.get(m));
 							double leg2 = this.region.sKernal.get(e).get(e2).get(l) * conts.wew.get(m2) * Legendre.evaluate(l, conts.mew.get(m2)); 
 							double flux = this.flux.get(1).get(0).get(m2).get(e2);
@@ -158,7 +158,7 @@ class Mesh {
 	}
 	
 	boolean convengenceCheck(Constants conts){
-		for(int m = 0; m < conts.mew.size(); m++){
+		for(int m = 0, mew = conts.mew.size(); m < mew; m++){
 			for(int e = 0; e < conts.eBins; e++){
 				if(this.flux.get(1).get(0).get(m).get(e) > conts.convergence * this.fluxTotal.get(1).get(0).get(m).get(e)){
 					return false;
