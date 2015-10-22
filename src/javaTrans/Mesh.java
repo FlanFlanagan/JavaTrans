@@ -2,9 +2,6 @@ package javaTrans;
 
 import java.util.ArrayList;
 
-import org.opensourcephysics.numerics.specialfunctions.Legendre;
-import org.opensourcephysics.resources.numerics.specialfunctions;
-
 class Mesh {
 	double xLower;
 	double xUpper;
@@ -30,12 +27,19 @@ class Mesh {
 	ArrayList<ArrayList<ArrayList<ArrayList<Double>>>> fluxPTotal = new ArrayList<ArrayList<ArrayList<ArrayList<Double>>>>();
 	ArrayList<Double> energyFlux = new ArrayList<Double>();
 	Double[][][] sourceTArray;
+	Double[][][][] fluxArray;
+	Double[][][][] fluxTArray;
+	Double[][][][] fluxPTArray;
 	double FinalFlux;
 	
 	Mesh(Constants conts, double size, int xPos, Region region){
 		/**TODO double check the ArrayLists here. It might be easier to just store i-1/2, i, 1+1/2 */
 		buildFluxes(conts);
 		buildSource(conts);
+		source2Array();
+		this.fluxArray = flux2Array(this.flux);
+		this.fluxTArray = flux2Array(this.fluxTotal);
+		this.fluxPTArray = flux2Array(this.fluxPTotal);
 		this.sizeX = size;
 		this.xLower = xPos * size;
 		this.xPosition = this.xLower + size / 2.;
@@ -43,13 +47,40 @@ class Mesh {
 		this.region = region;
 	}
 	
-	void adlk(){
-		for(int i = 0, si = this.sourceTerm.size(); i < si; i++){
-			for(int j = 0, ji = this.sourceTerm.get(i).size(); j < ji; j++){
-				Double[] tempArray = (Double[]) this.sourceTerm.get(i).get(j).toArray();
-				this.sourceTArray[i][j] = tempArray;
+	Double[][][][] flux2Array(ArrayList<ArrayList<ArrayList<ArrayList<Double>>>> arrayList){
+		Double[][][][] tempArray = new Double[arrayList.size()][][][];
+		for(int i = 0, ii = arrayList.size(); i < ii; i++){
+			Double[][][] tempArray1 = new Double[arrayList.get(i).size()][][];
+			for(int j = 0, ji = arrayList.get(i).size(); j < ji; j++){
+				Double[][] tempArray2 = new Double[arrayList.get(i).get(j).size()][];
+				for(int k = 0, ki = arrayList.get(i).get(j).size(); k < ki; k++){
+					Double[] tempArray3 = new Double[arrayList.get(i).get(j).get(k).size()];
+					for(int m = 0, mi = arrayList.get(i).get(j).get(k).size(); m < mi; m++){
+						tempArray3[m] = arrayList.get(i).get(j).get(k).get(m);
+					}
+					tempArray2[k] = tempArray3;
+				}
+				tempArray1[j] = tempArray2;
 			}
+			tempArray[i] = tempArray1;
 		}
+		return tempArray;
+	}
+	
+	void source2Array(){
+		Double[][][] tempArray = new Double[this.sourceTerm.size()][][];
+		for(int i = 0, si = this.sourceTerm.size(); i < si; i++){
+			Double[][] tempArray1 = new Double[this.sourceTerm.get(i).size()][];
+			for(int j = 0, ji = this.sourceTerm.get(i).size(); j < ji; j++){
+				Double[] tempArray2 = new Double[this.sourceTerm.get(i).get(j).size()];
+				for(int k = 0, ki = this.sourceTerm.get(i).get(j).size(); k < ki; k++){
+					tempArray2[k] = this.sourceTerm.get(i).get(j).get(k);
+				}
+				tempArray1[j] = tempArray2;
+			}
+			tempArray[i] = tempArray1;
+		}
+		this.sourceTArray = tempArray;
 	}
 	
 	void buildFluxes(Constants conts){
@@ -65,7 +96,7 @@ class Mesh {
 					ArrayList<Double> binsCurrent = new ArrayList<Double>();
 					ArrayList<Double> binsOld = new ArrayList<Double>();
 					ArrayList<Double> binsFlux = new ArrayList<Double>();
-					for(int bin = 0; bin < conts.groups; bin++){
+					for(int bin = 0; bin < conts.eBins; bin++){
 						binsCurrent.add(0.);
 						binsOld.add(0.);
 						binsFlux.add(0.);
@@ -89,72 +120,74 @@ class Mesh {
 			ArrayList<ArrayList<Double>> sourceCurrent = new ArrayList<ArrayList<Double>>();
 			for(int k = 0; k < conts.ordinates; k++){
 				ArrayList<Double> binsCurrent = new ArrayList<Double>();
-				for(int bin = 0; bin < conts.groups; bin++){
-					binsCurrent.add(conts.source / ((conts.ordinates * conts.wew.get(k))/2));
+				for(int bin = 0; bin < conts.eBins; bin++){
+					binsCurrent.add(conts.source / ((conts.ordinates * conts.wew[k])/2));
 				}
 				sourceCurrent.add(binsCurrent);
 			}
 			this.sourceTerm.add(sourceCurrent);	
 		}
 	}
+	
 	void setFlux(int edge, int mew, int e, double flux){
-		this.flux.get(edge).get(0).get(mew).set(e, flux);
+		this.fluxArray[edge][0][mew][e] = flux;
 	}
 	
+	void zeroFlux(){
+		for(int i = 0, ii = this.fluxArray.length; i < ii; i++){
+			for(int j = 0, ji = this.fluxArray[i].length; j < ji; j++){
+				for(int k = 0, ki = this.fluxArray[i][j].length; k < ki; k++){
+					for(int m = 0, mi = this.fluxArray[i][j][k].length; m < mi; m++){
+						this.fluxArray[i][j][k][m] = 0.;
+					}
+				}
+			}
+		}
+	}
 	
 	void calcFluxCenterXR(int mew, int e, Constants conts){
-		double left = this.sizeX * this.sourceTerm.get(0).get(mew).get(e);
-		double mewNum = 2 * conts.mew.get(mew) * this.flux.get(0).get(0).get(mew).get(e);
-		double denom = 2 * (conts.mew.get(mew) + this.sizeX * this.region.totalXS.get(e));
-		this.flux.get(1).get(0).get(mew).set(e, (left + mewNum) / denom);
+		double left = this.sizeX * this.sourceTArray[0][mew][e];
+		double mewNum = 2 * conts.mew[mew] * this.fluxArray[0][0][mew][e];
+		double denom = 2 * conts.mew[mew] + this.sizeX * this.region.totalXS.get(e);
+		this.fluxArray[1][0][mew][e] = (left + mewNum) / denom;
 	}
 	
 	void calcFluxCenterXL(int mew, int e, Constants conts){
-		double left = this.sizeX * this.sourceTerm.get(0).get(mew).get(e);
-		double mewNum = 2 * conts.mew.get(mew) * this.flux.get(2).get(0).get(mew).get(e);
-		double denom = -2 * (conts.mew.get(mew) + this.sizeX * this.region.totalXS.get(e));
-		this.flux.get(1).get(0).get(mew).set(e, (left - mewNum) / denom);
+		double left = this.sizeX * this.sourceTArray[0][mew][e];
+		double mewNum = 2 * conts.mew[mew] * this.fluxArray[2][0][mew][e];
+		double denom = -2 * conts.mew[mew] + this.sizeX * this.region.totalXS.get(e);
+		this.fluxArray[1][0][mew][e] = (left - mewNum) / denom;
 	}
 	
 	void calcFluxRightX(int mew, int e, Constants conts){
-		/*double left = 2*this.meshPoints.get(m).flux.get(1).get(0).get(mew).get(e);
-		double right = this.meshPoints.get(m).flux.get(0).get(0).get(mew).get(e);
-		this.meshPoints.get(m).flux.get(2).get(0).get(mew).set(e, ((2 * left) - right));*/
-		this.flux.get(2).get(0).get(mew).set(e, ((2*this.flux.get(1).get(0).get(mew).get(e)) - this.flux.get(0).get(0).get(mew).get(e)));
+		this.fluxArray[2][0][mew][e] = 2*this.fluxArray[1][0][mew][e] - this.fluxArray[0][0][mew][e];
 	}
 	
 	void calcFluxLeftX(int mew, int e, Constants conts){
-		/*double left = 2*this.meshPoints.get(m).flux.get(1).get(0).get(mew).get(e);
-		double right = this.meshPoints.get(m).flux.get(2).get(0).get(mew).get(e);
-		this.meshPoints.get(m).flux.get(0).get(0).get(mew).set(e, ((2 * left) - right));*/
-		this.flux.get(0).get(0).get(mew).set(e, ((2*this.flux.get(1).get(0).get(mew).get(e)) - this.flux.get(2).get(0).get(mew).get(e)));		
+		this.fluxArray[0][0][mew][e] = 2*this.fluxArray[1][0][mew][e] - this.fluxArray[2][0][mew][e];		
 	}
 	
 	void zeroSource(){
-		for(int i = 0; i < this.sourceTerm.size(); i++){
-			for(int j = 0; j < this.sourceTerm.get(i).size(); j++){
-				for(int k = 0; k < this.sourceTerm.get(i).get(j).size(); k++){
-					this.sourceTerm.get(i).get(j).set(k, 0.);
+		for(int i = 0; i < this.sourceTArray.length; i++){
+			for(int j = 0; j < this.sourceTArray[i].length; j++){
+				for(int k = 0; k < this.sourceTArray[i][j].length; k++){
+					this.sourceTArray[i][j][k] = 0.;
 				}
 			}
 		}
 	}
 	
 	void setSource(int mew, int e, double flux){
-		this.sourceTerm.get(0).get(mew).set(e, flux);
+		this.sourceTArray[0][mew][e] = flux;
 	}
 	
 	void calcScatter(Constants conts){
-		for(int m = 0, mew = conts.mew.size(); m < mew; m++){
+		for(int l = 0; l < conts.legendre; l++){
 			for(int e = 0; e < conts.eBins; e++){
-				for(int l = 0; l < conts.legendre; l++){
+				for(int m = 0, mew = conts.mew.length; m < mew; m++){
 					for(int e2 = 0; e2 < conts.eBins; e2++){
 						for(int m2 = 0; m2 < mew; m2++){
-							/*double leg1 = 0.5 * (2 * l + 1) * Legendre.evaluate(l, conts.mew.get(m));
-							double leg2 = this.region.sKernal.get(e).get(e2).get(l) * conts.wew.get(m2) * Legendre.evaluate(l, conts.mew.get(m2)); 
-							double flux = this.flux.get(1).get(0).get(m2).get(e2);
-							this.sourceTerm.get(0).get(m).set(e, this.sourceTerm.get(0).get(m).get(e) + leg1 * leg2 * flux);*/
-							this.sourceTerm.get(0).get(m).set(e, this.sourceTerm.get(0).get(m).get(e) + (0.5) * (2 * l + 1) * Legendre.evaluate(l, conts.mew.get(m)) * this.region.sKernal.get(e).get(e2).get(l) * conts.wew.get(m2) * Legendre.evaluate(l, conts.mew.get(m2)) * this.flux.get(1).get(0).get(m2).get(e2));
+							this.sourceTArray[0][m][e] += (0.5) * ((2 * l + 1) * conts.lgdr[l][m]) * this.region.sKernalArray[e][e2][l] * (conts.wew[m2] * conts.lgdr[l][m2] * this.fluxArray[1][0][m2][e2]);
 						}
 					}
 				}
@@ -162,14 +195,23 @@ class Mesh {
 		}
 	}
 	
+	void printSource(){
+		for(int i = 0; i < this.sourceTArray[0].length; i++){
+			for(int j = 0; j < this.sourceTArray[0][i].length; j++){
+				System.out.print(String.format("%-20s" , this.sourceTArray[0][i][j] + " "));
+			}
+			System.out.print("\n");
+		}
+	}
+	
 	void sumTotal(int edge, int mew, int e){
-		this.fluxTotal.get(edge).get(0).get(mew).set(e, this.fluxTotal.get(edge).get(0).get(mew).get(e) + this.flux.get(edge).get(0).get(mew).get(e));
+		this.fluxTArray[edge][0][mew][e] += this.fluxArray[edge][0][mew][e];
 	}
 	
 	boolean convengenceCheck(Constants conts){
-		for(int m = 0, mew = conts.mew.size(); m < mew; m++){
+		for(int m = 0, mew = conts.mew.length; m < mew; m++){
 			for(int e = 0; e < conts.eBins; e++){
-				if(this.flux.get(1).get(0).get(m).get(e) > conts.convergence * this.fluxTotal.get(1).get(0).get(m).get(e)){
+				if(this.fluxArray[1][0][m][e] > conts.convergence * this.fluxTArray[1][0][m][e]){
 					return false;
 				}
 			}
@@ -180,8 +222,8 @@ class Mesh {
 	void sumTotalEFlux(){
 		for(int e = 0; e < region.conts.eBins; e++){
 			double totalEFlux = 0;
-			for(int m = 0, mew = region.conts.mew.size(); m < mew; m++){
-				totalEFlux += this.fluxTotal.get(1).get(0).get(m).get(e);
+			for(int m = 0, mew = region.conts.mew.length; m < mew; m++){
+				totalEFlux += this.fluxTArray[1][0][m][e];
 			}
 			this.energyFlux.add(totalEFlux);
 		}

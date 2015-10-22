@@ -47,7 +47,7 @@ public class ProjectBuilder {
 		while(!strings.get(i).equalsIgnoreCase("isos end")){
 			Isotope iso = new Isotope(strings.get(i));
 			isos.add(iso);
-			iso.printInfo();
+			//iso.printInfo();
 			conts.eBins = iso.eBins;
 			i++;
 		}

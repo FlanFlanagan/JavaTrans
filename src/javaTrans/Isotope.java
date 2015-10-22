@@ -145,7 +145,6 @@ class Isotope {
 	}
 	
 	void readSkernal(Vector<String> strings, int i){
-		int limit = i + eBins;
 		//size up group to group lists
 		for(int j = 0; j < eBins; j++){
 			ArrayList<ArrayList<Double>> tempArray = new ArrayList<ArrayList<Double>>();
@@ -155,10 +154,10 @@ class Isotope {
 			this.sKernal.add(tempArray);
 		}
 		//add known legendre moments
-		for(;i < limit; i++){
+		for(;i < strings.size(); i++){
 			String[] tempStrings = strings.get(i).split(" ");
-			int toGroup = eBins - Integer.parseInt(tempStrings[0]);
-			int fromGroup = eBins - Integer.parseInt(tempStrings[1]);
+			int fromGroup = eBins - Integer.parseInt(tempStrings[0]);
+			int toGroup = eBins - Integer.parseInt(tempStrings[1]);
 			ArrayList<Double> legendre = new ArrayList<Double>();
 			for(int j = 2; j < tempStrings.length; j++){
 				legendre.add(Double.parseDouble(tempStrings[j]));

@@ -25,6 +25,8 @@ public class Region {
 	Constants conts;
 	
 	ArrayList<ArrayList<ArrayList<Double>>> sKernal = new ArrayList<ArrayList<ArrayList<Double>>>();
+	Double[][][] sKernalArray; 
+	
 	ArrayList<Double> totalXS = new ArrayList<Double>();
 	ArrayList<Double> absorbXS = new ArrayList<Double>();
 	ArrayList<Double> scatterXS = new ArrayList<Double>();
@@ -47,6 +49,7 @@ public class Region {
 		this.zeroXS();
 		this.sumFissile(projectIsos);
 		this.buildXS(projectIsos);
+		this.skernal2Array();
 		this.buildMeshValues();
 		this.buildMesh();
 	}
@@ -87,11 +90,37 @@ public class Region {
 				for(int i = 0; i < iso.eBins; i++){
 					for(int j = 0; j < iso.eBins; j++){
 						for(int lgdr = 0; lgdr < iso.legdrNum; lgdr ++){
-							this.sKernal.get(i).get(j).set(lgdr, this.sKernal.get(i).get(j).get(lgdr) + (this.isotopes.get(iso.name) * iso.sKernal.get(i).get(j).get(lgdr)));
+							this.sKernal.get(i).get(j).set(lgdr, (this.isotopes.get(iso.name) * iso.sKernal.get(i).get(j).get(lgdr)));
 						}
 					}
 				}	
 			}
+		}
+	}
+	
+	void skernal2Array(){
+		Double[][][] tempArray = new Double[this.sKernal.size()][][];
+		for(int i = 0, si = this.sKernal.size(); i < si; i++){
+			Double[][] tempArray1 = new Double[this.sKernal.get(i).size()][];
+			for(int j = 0, ji = this.sKernal.get(i).size(); j < ji; j++){
+				Double[] tempArray2 = new Double[this.sKernal.get(i).get(j).size()];
+				for(int k = 0, ki = this.sKernal.get(i).get(j).size(); k < ki; k++){
+					tempArray2[k] = this.sKernal.get(i).get(j).get(k);
+				}
+				tempArray1[j] = tempArray2;
+			}
+			tempArray[i] = tempArray1;
+		}
+		this.sKernalArray = tempArray;
+		//printSkernalArray();
+	}
+	
+	void printSkernalArray(){
+		for(int i = 0; i < this.sKernalArray.length; i++){
+			for(int j = 0; j < this.sKernalArray[i].length; j++){
+				System.out.print(String.format("%-20s" , this.sKernalArray[i][j][1]));
+			}
+			System.out.print('\n');
 		}
 	}
 	
@@ -192,16 +221,14 @@ public class Region {
 	
 	void sweepRight(){
 		for(int m = 0; m < this.meshNumber; m++){
-			for(int mew = 0; mew < this.conts.mew.size()/2; mew++){
+			for(int mew = 0; mew < this.conts.mew.length/2; mew++){
 				for(int e = 0; e < this.conts.eBins; e++){
 					this.meshPoints.get(m).calcFluxCenterXR(mew, e, this.conts);
 					this.meshPoints.get(m).calcFluxRightX(mew, e, this.conts);
 					if(m < meshPoints.size()-1){
-						this.meshPoints.get(m+1).setFlux(0, mew, e, this.meshPoints.get(m).flux.get(1).get(0).get(mew).get(e));
-					}					
-					for(int edge = 0; edge < this.conts.edges; edge++){
-						this.meshPoints.get(m).sumTotal(edge, mew, e);
-					}
+						this.meshPoints.get(m+1).setFlux(0, mew, e, this.meshPoints.get(m).fluxArray[2][0][mew][e]);
+					}	
+					this.meshPoints.get(m).sumTotal(1, mew, e);
 				}
 			}
 		}
@@ -209,16 +236,14 @@ public class Region {
 	
 	void sweepLeft(){
 		for(int m = this.meshNumber-1; m >= 0; m--){
-			for(int mew = this.conts.mew.size()/2; mew < this.conts.mew.size(); mew++){
+			for(int mew = this.conts.mew.length/2; mew < this.conts.mew.length; mew++){
 				for(int e = 0; e < this.conts.eBins; e++){
 					this.meshPoints.get(m).calcFluxCenterXL(mew, e, this.conts);
 					this.meshPoints.get(m).calcFluxLeftX(mew, e, this.conts);
 					if(m > 0){
-						this.meshPoints.get(m-1).setFlux(2, mew, e, this.meshPoints.get(m).flux.get(1).get(0).get(mew).get(e));
+						this.meshPoints.get(m-1).setFlux(2, mew, e, this.meshPoints.get(m).fluxArray[0][0][mew][e]);
 					}	
-					for(int edge = 0; edge < this.conts.edges; edge++){ 	
-						this.meshPoints.get(m).sumTotal(edge, mew, e);
-					}
+					this.meshPoints.get(m).sumTotal(1, mew, e);
 				}
 			}
 		}
@@ -232,6 +257,12 @@ public class Region {
 		
 	}
 	
+	void zeroFlux(){
+		for(Mesh mesh: this.meshPoints){
+			mesh.zeroFlux();
+		}
+	}
+	
 	boolean convergenceCheck(){
 		for(int mesh = 0; mesh < this.meshNumber; mesh++){
 			if(!this.meshPoints.get(mesh).convengenceCheck(conts)){
@@ -239,5 +270,13 @@ public class Region {
 			}
 		}
 		return true;
+	}
+	
+	void setBeamSource(double flux){
+		double absorption = this.absorbXS.get(0);
+		for(Mesh mesh: this.meshPoints){
+			mesh.setSource(0, 0, flux*Math.exp(-absorption*mesh.xPosition));
+			//System.out.println(mesh.xPosition + ": " + mesh.sourceTArray[0][0][0]);
+		}
 	}
 }

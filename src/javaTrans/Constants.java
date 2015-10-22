@@ -1,63 +1,31 @@
 package javaTrans;
 
-import java.util.ArrayList;
+import org.opensourcephysics.numerics.specialfunctions.Legendre;
 
 public class Constants {
 	int ordinates = 8;
 	int dimensions = 1;
-	int groups = 10; /** TODO have this derive from Isotopes */
-	double convergence = 0.001;
+	double convergence = 0.00001;
 	int legendre = 9;
 	int edges = 3;
 	double source = 0.;
 	int eBins;
 	
 	
-	ArrayList<Double> mew = new ArrayList<Double>();
-	ArrayList<Double> wew = new ArrayList<Double>();
+	Double[] mew;
+	Double[] wew;
 	double minMew;
 	
-	ArrayList<Double> mew2 = new ArrayList<Double>(){
-		{
-			this.add(0.5774);
-			this.add(-0.5774);
-		}
-	};
+	Double[][] lgdr;
 	
-	ArrayList<Double> wew2 = new ArrayList<Double>(){
-		{
-			this.add(1.);
-			this.add(1.);
-		}
-	};
-	
-	ArrayList<Double> mew8 = new ArrayList<Double>(){
-		{
-			this.add(0.9603);
-			this.add(0.7967);
-			this.add(0.5255);
-			this.add(0.1834);
-			this.add(-0.1834);
-			this.add(-0.5255);
-			this.add(-0.7967);
-			this.add(-0.9603);
-		}
-	};
-	ArrayList<Double> wew8 = new ArrayList<Double>(){
-		{
-			this.add(0.1021);
-			this.add(0.2224);
-			this.add(0.3137);
-			this.add(0.3627);
-			this.add(0.3627);
-			this.add(0.3137);
-			this.add(0.2224);
-			this.add(0.1021);
-		}
-	};
+	Double[] mew2 = {0.5774, -0.5774};
+	Double[] wew2 = {1., 1.};
+	Double[] mew8 = {0.9603, 0.7967, 0.5255, 0.1834, -.01834, -0.5255, -0.7967, -0.9603};
+	Double[] wew8 = {0.1021 , 0.2224, 0.3137, 0.3627, 0.3627, 0.3137, 0.2224, 0.1021};
 	
 	Constants(){
 		mewTest();
+		buildLgdr();
 	}
 	
 	void mewTest(){
@@ -70,5 +38,15 @@ public class Constants {
 			wew = wew8;
 			minMew = 0.1834;
 		}
+	}
+	
+	void buildLgdr(){
+		Double[][] tempArray = new Double[this.legendre][this.mew.length];
+		for(int l = 0; l < legendre; l++){
+			for(int m = 0, mew = this.mew.length; m < mew; m++){
+				tempArray[l][m] = Legendre.evaluate(l, this.mew[m]);
+			}
+		}
+		this.lgdr = tempArray;
 	}
 }
