@@ -25,7 +25,7 @@ public class Region {
 	Constants conts;
 	
 	ArrayList<ArrayList<ArrayList<Double>>> sKernal = new ArrayList<ArrayList<ArrayList<Double>>>();
-	Double[][][] sKernalArray; 
+	double[][][] sKernalArray; 
 	
 	ArrayList<Double> totalXS = new ArrayList<Double>();
 	ArrayList<Double> absorbXS = new ArrayList<Double>();
@@ -99,11 +99,11 @@ public class Region {
 	}
 	
 	void skernal2Array(){
-		Double[][][] tempArray = new Double[this.sKernal.size()][][];
+		double[][][] tempArray = new double[this.sKernal.size()][][];
 		for(int i = 0, si = this.sKernal.size(); i < si; i++){
-			Double[][] tempArray1 = new Double[this.sKernal.get(i).size()][];
+			double[][] tempArray1 = new double[this.sKernal.get(i).size()][];
 			for(int j = 0, ji = this.sKernal.get(i).size(); j < ji; j++){
-				Double[] tempArray2 = new Double[this.sKernal.get(i).get(j).size()];
+				double[] tempArray2 = new double[this.sKernal.get(i).get(j).size()];
 				for(int k = 0, ki = this.sKernal.get(i).get(j).size(); k < ki; k++){
 					tempArray2[k] = this.sKernal.get(i).get(j).get(k);
 				}
@@ -186,7 +186,7 @@ public class Region {
 	
 	void buildMesh(){
 		while(this.meshPoints.size() < this.meshNumber){
-			this.meshPoints.add(new Mesh(this.conts, this.meshSize, this.meshPoints.size(), this));
+			this.meshPoints.add(new Mesh(this.conts, this.meshSize, this.meshPoints.size(), this.xLower, this));
 		}
 	}
 		

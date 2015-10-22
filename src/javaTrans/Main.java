@@ -12,7 +12,7 @@ public class Main {
 		ProjectBuilder.buildProblem(projectIsos, regions, conts);
 		int count = 0;
 		regions.get(0).setBeamSource(1000000);
-		while(count < 180){
+		while(convergenceTest(regions) != true || count == 0){
 			for(int i = 0; i < regions.size(); i++){
 				regions.get(i).sweepLeft();
 				if(i < regions.size()-1){
@@ -28,8 +28,8 @@ public class Main {
 			for(int i = 0; i < regions.size(); i++){
 				regions.get(i).sourceCalc();
 			}
-			//count++;
-			System.out.println(count);
+			count++;
+			//System.out.println(count);
 		}
 		double time2 = System.nanoTime();
 		for(Region reg: regions){
@@ -56,5 +56,14 @@ public class Main {
 				reg2.meshPoints.get(0).fluxArray[2][0][mew][e] = reg1.meshPoints.get(reg1.meshNumber-1).fluxArray[0][0][mew][e];
 			}
 		}	
+	}
+	
+	static boolean convergenceTest(ArrayList<Region> regions){
+		for(Region reg: regions){
+			if(!reg.convergenceCheck()){
+				return false;
+			}
+		}
+		return true;
 	}
 }

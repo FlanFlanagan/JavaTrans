@@ -26,13 +26,13 @@ class Mesh {
 	ArrayList<ArrayList<ArrayList<ArrayList<Double>>>> fluxTotal = new ArrayList<ArrayList<ArrayList<ArrayList<Double>>>>();
 	ArrayList<ArrayList<ArrayList<ArrayList<Double>>>> fluxPTotal = new ArrayList<ArrayList<ArrayList<ArrayList<Double>>>>();
 	ArrayList<Double> energyFlux = new ArrayList<Double>();
-	Double[][][] sourceTArray;
-	Double[][][][] fluxArray;
-	Double[][][][] fluxTArray;
-	Double[][][][] fluxPTArray;
+	double[][][] sourceTArray;
+	double[][][][] fluxArray;
+	double[][][][] fluxTArray;
+	double[][][][] fluxPTArray;
 	double FinalFlux;
 	
-	Mesh(Constants conts, double size, int xPos, Region region){
+	Mesh(Constants conts, double size, int pos, double xLower2, Region region){
 		/**TODO double check the ArrayLists here. It might be easier to just store i-1/2, i, 1+1/2 */
 		buildFluxes(conts);
 		buildSource(conts);
@@ -41,20 +41,20 @@ class Mesh {
 		this.fluxTArray = flux2Array(this.fluxTotal);
 		this.fluxPTArray = flux2Array(this.fluxPTotal);
 		this.sizeX = size;
-		this.xLower = xPos * size;
+		this.xLower = xLower2 + pos * size;
 		this.xPosition = this.xLower + size / 2.;
 		this.xUpper = this.xLower + size;
 		this.region = region;
 	}
 	
-	Double[][][][] flux2Array(ArrayList<ArrayList<ArrayList<ArrayList<Double>>>> arrayList){
-		Double[][][][] tempArray = new Double[arrayList.size()][][][];
+	double[][][][] flux2Array(ArrayList<ArrayList<ArrayList<ArrayList<Double>>>> arrayList){
+		double[][][][] tempArray = new double[arrayList.size()][][][];
 		for(int i = 0, ii = arrayList.size(); i < ii; i++){
-			Double[][][] tempArray1 = new Double[arrayList.get(i).size()][][];
+			double[][][] tempArray1 = new double[arrayList.get(i).size()][][];
 			for(int j = 0, ji = arrayList.get(i).size(); j < ji; j++){
-				Double[][] tempArray2 = new Double[arrayList.get(i).get(j).size()][];
+				double[][] tempArray2 = new double[arrayList.get(i).get(j).size()][];
 				for(int k = 0, ki = arrayList.get(i).get(j).size(); k < ki; k++){
-					Double[] tempArray3 = new Double[arrayList.get(i).get(j).get(k).size()];
+					double[] tempArray3 = new double[arrayList.get(i).get(j).get(k).size()];
 					for(int m = 0, mi = arrayList.get(i).get(j).get(k).size(); m < mi; m++){
 						tempArray3[m] = arrayList.get(i).get(j).get(k).get(m);
 					}
@@ -68,11 +68,11 @@ class Mesh {
 	}
 	
 	void source2Array(){
-		Double[][][] tempArray = new Double[this.sourceTerm.size()][][];
+		double[][][] tempArray = new double[this.sourceTerm.size()][][];
 		for(int i = 0, si = this.sourceTerm.size(); i < si; i++){
-			Double[][] tempArray1 = new Double[this.sourceTerm.get(i).size()][];
+			double[][] tempArray1 = new double[this.sourceTerm.get(i).size()][];
 			for(int j = 0, ji = this.sourceTerm.get(i).size(); j < ji; j++){
-				Double[] tempArray2 = new Double[this.sourceTerm.get(i).get(j).size()];
+				double[] tempArray2 = new double[this.sourceTerm.get(i).get(j).size()];
 				for(int k = 0, ki = this.sourceTerm.get(i).get(j).size(); k < ki; k++){
 					tempArray2[k] = this.sourceTerm.get(i).get(j).get(k);
 				}
