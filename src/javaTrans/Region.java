@@ -168,7 +168,7 @@ public class Region {
 	void calcMeshSize(){
 		this.meshSize = this.xUpper - this.xLower;
 		while(this.meshSize > this.maxMesh){
-			meshSize /= 2;
+			this.meshSize /= 2;
 		}
 	}
 	
