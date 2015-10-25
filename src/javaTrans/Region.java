@@ -18,25 +18,26 @@ public class Region {
 	Map<Integer, Double> isotopes = new HashMap<Integer, Double>();	
 	String regionType;
 	double fissileNumDen = 0;
+	double criticality = 1.1;
 	double maxMesh;
 	double meshSize;
 	int meshNumber;
 	double maxXS;
 	Constants conts;
+	ArrayList<Isotope> projectIsos;
 	
-	ArrayList<ArrayList<ArrayList<Double>>> sKernal = new ArrayList<ArrayList<ArrayList<Double>>>();
 	double[][][] sKernalArray; 
-	
-	ArrayList<Double> totalXS = new ArrayList<Double>();
-	ArrayList<Double> absorbXS = new ArrayList<Double>();
-	ArrayList<Double> scatterXS = new ArrayList<Double>();
-	ArrayList<Double> chi = new ArrayList<Double>();
+	double[] totalXS;
+	double[] absorbXS;
+	double[] scatterXS;
+	double[] chi;
+	double[] nufission;
 	
 	double totalC;
 	double absorbC;
 	double nuFissionC;
 	
-	ArrayList<Double> finalFlux = new ArrayList<Double>();
+	double[] finalFlux;
 	double finalFF;
 	double fluxFF;
 	
@@ -46,10 +47,10 @@ public class Region {
 		this.regionType = type;
 		this.isotopes = isotopes;
 		this.conts = conts;
+		this.projectIsos = projectIsos;
 		this.zeroXS();
 		this.sumFissile(projectIsos);
 		this.buildXS(projectIsos);
-		this.skernal2Array();
 		this.buildMeshValues();
 		this.buildMesh();
 	}
@@ -63,22 +64,23 @@ public class Region {
 			}
 		}
 	}
-	
+		
 	void buildTotal(ArrayList<Isotope> projectIsos){
 		for(Isotope iso: projectIsos){
 			if(this.isotopes.containsKey(iso.name)){
 				for(int i = 0; i < iso.eBins; i++){
-					this.totalXS.set(i, (this.totalXS.get(i) + (this.isotopes.get(iso.name) * iso.totalXS.get(i))));
+					this.totalXS[i] += this.isotopes.get(iso.name) * iso.totalXS.get(i);
 				}	
 			}
 		}
 	}
 	
 	void buildChi(ArrayList<Isotope> projectIsos){
+		this.chi = new double[this.conts.eBins];
 		for(Isotope iso: projectIsos){
 			if(isotopes.containsKey(iso.name) && iso.fissile == true){
 				for(int i = 0; i < iso.eBins; i++){
-					this.chi.set(i, (this.chi.get(i) + (this.isotopes.get(iso.name)/this.fissileNumDen * iso.chi.get(i))));
+					this.chi[i] +=this.isotopes.get(iso.name)/this.fissileNumDen * iso.chi.get(i);
 				}	
 			}
 		}
@@ -90,29 +92,12 @@ public class Region {
 				for(int i = 0; i < iso.eBins; i++){
 					for(int j = 0; j < iso.eBins; j++){
 						for(int lgdr = 0; lgdr < iso.legdrNum; lgdr ++){
-							this.sKernal.get(i).get(j).set(lgdr, (this.isotopes.get(iso.name) * iso.sKernal.get(i).get(j).get(lgdr)));
+							this.sKernalArray[i][j][lgdr] += this.isotopes.get(iso.name) * iso.sKernal.get(i).get(j).get(lgdr);
 						}
 					}
 				}	
 			}
 		}
-	}
-	
-	void skernal2Array(){
-		double[][][] tempArray = new double[this.sKernal.size()][][];
-		for(int i = 0, si = this.sKernal.size(); i < si; i++){
-			double[][] tempArray1 = new double[this.sKernal.get(i).size()][];
-			for(int j = 0, ji = this.sKernal.get(i).size(); j < ji; j++){
-				double[] tempArray2 = new double[this.sKernal.get(i).get(j).size()];
-				for(int k = 0, ki = this.sKernal.get(i).get(j).size(); k < ki; k++){
-					tempArray2[k] = this.sKernal.get(i).get(j).get(k);
-				}
-				tempArray1[j] = tempArray2;
-			}
-			tempArray[i] = tempArray1;
-		}
-		this.sKernalArray = tempArray;
-		//printSkernalArray();
 	}
 	
 	void printSkernalArray(){
@@ -128,7 +113,7 @@ public class Region {
 		for(Isotope iso: projectIsos){
 			if(isotopes.containsKey(iso.name)){
 				for(int i = 0; i < iso.eBins; i++){
-					this.scatterXS.set(i, (this.scatterXS.get(i) + (this.isotopes.get(iso.name) * iso.scatterXS.get(i))));
+					this.scatterXS[i] += (this.isotopes.get(iso.name) * iso.scatterXS[i]);
 				}	
 			}
 		}
@@ -138,10 +123,22 @@ public class Region {
 		for(Isotope iso: projectIsos){
 			if(isotopes.containsKey(iso.name)){
 				for(int i = 0; i < iso.eBins; i++){
-					this.absorbXS.set(i, (this.absorbXS.get(i) + (this.isotopes.get(iso.name) * iso.absorbXS.get(i))));
+					this.absorbXS[i] += this.isotopes.get(iso.name) * iso.absorbXS[i];
 				}	
 			}
 		}
+	}
+	
+	void buildNuFission(){
+		double[] tempArray = new double[this.totalXS.length];
+		for(Isotope iso: projectIsos){
+			if(isotopes.containsKey(iso.name) && iso.fissile){
+				for(int i = 0, max = iso.eBins; i < max; i++){
+					tempArray[i] += this.isotopes.get(iso.name) * iso.nuFission.get(i);
+				}
+			}
+		}
+		this.nufission = tempArray;
 	}
 	
 	void buildXS(ArrayList<Isotope> projectIsos){
@@ -150,13 +147,14 @@ public class Region {
 		this.buildScatter(projectIsos);
 		this.buildSkernal(projectIsos);
 		this.buildAbsorb(projectIsos);
+		this.buildNuFission();
 	}
 	
 	void calcMaxXS(){
-		this.maxXS = this.totalXS.get(0);
-		for(int i = 0; i < this.totalXS.size(); i++){
-			if(this.totalXS.get(i) > maxXS){
-				this.maxXS = this.totalXS.get(i);
+		this.maxXS = this.totalXS[0];
+		for(int i = 0; i < this.totalXS.length; i++){
+			if(this.totalXS[i] > maxXS){
+				this.maxXS = this.totalXS[i];
 			}
 		}
 	}
@@ -181,6 +179,7 @@ public class Region {
 		this.calcMaxXS();
 		this.calcMaxMesh();
 		this.calcMeshSize();
+		//this.meshSize = 0.4;
 		this.calcMeshNumber();
 	}
 	
@@ -191,24 +190,17 @@ public class Region {
 	}
 		
 	void zeroXS(){
-		for(int i = 0; i < conts.eBins; i++){
-			this.totalXS.add(0.);
-			this.absorbXS.add(0.);
-			this.scatterXS.add(0.);
-			this.chi.add(0.);
-			this.finalFlux.add(0.);
-		}
-		for(int i = 0; i < this.conts.eBins; i++){
-			ArrayList<ArrayList<Double>> tempList1 = new ArrayList<ArrayList<Double>>();
-			for(int j = 0; j < this.conts.eBins; j++){
-				ArrayList<Double> tempList2 = new ArrayList<Double>();
-				for(int k = 0; k < this.conts.legendre; k++){
-					tempList2.add(0.);
-				}
-				tempList1.add(tempList2);
-			}
-			this.sKernal.add(tempList1);
-		}
+		this.totalXS = new double[conts.eBins];
+		this.absorbXS = new double[conts.eBins];
+		this.scatterXS = new double[conts.eBins];
+		this.chi = new double[conts.eBins];
+		this.finalFlux = new double[conts.eBins];
+		/*Arrays.fill(this.totalXS, 0);
+		Arrays.fill(this.absorbXS, 0);
+		Arrays.fill(this.scatterXS, 0);
+		Arrays.fill(this.chi, 0);
+		this.finalFlux.add(0.);*/
+		this.sKernalArray = new double[this.conts.eBins][this.conts.eBins][this.conts.legendre];
 	}
 
 	void printinfo() {
@@ -263,6 +255,12 @@ public class Region {
 		}
 	}
 	
+	void zeroTotalFlux(){
+		for(Mesh mesh: this.meshPoints){
+			mesh.zeroTotalFlux();
+		}
+	}
+	
 	boolean convergenceCheck(){
 		for(int mesh = 0; mesh < this.meshNumber; mesh++){
 			if(!this.meshPoints.get(mesh).convengenceCheck(conts)){
@@ -273,10 +271,10 @@ public class Region {
 	}
 	
 	void setBeamSource(double flux){
-		double absorption = this.absorbXS.get(0);
+		double absorption = this.absorbXS[0];
 		for(Mesh mesh: this.meshPoints){
 			mesh.setSource(0, 0, flux*Math.exp(-absorption*mesh.xPosition));
-			//System.out.println(mesh.xPosition + ": " + mesh.sourceTArray[0][0][0]);
+			System.out.println(mesh.xPosition + ": " + mesh.sourceTArray[0][0][0]);
 		}
 	}
 }

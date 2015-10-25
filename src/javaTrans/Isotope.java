@@ -24,8 +24,8 @@ class Isotope {
 	ArrayList<ArrayList<Double>> fFactor = new ArrayList<ArrayList<Double>>();
 	ArrayList<Double> newFFactors = new ArrayList<Double>();
 	ArrayList<Double> sigmaB = new ArrayList<Double>();
-	ArrayList<Double> scatterXS = new ArrayList<Double>();
-	ArrayList<Double> absorbXS = new ArrayList<Double>();
+	double[] scatterXS;
+	double[] absorbXS;
 	
 	double change;
 	double absorbC;
@@ -107,7 +107,7 @@ class Isotope {
 		return this.totalXS.size();
 	}
 	
-	void readFFactor(Vector<String> strings, int i){
+	int readFFactor(Vector<String> strings, int i){
 		int limit = i + eBins;
 		for(;i < limit; i++){
 			ArrayList<Double> tempArray = new ArrayList<Double>();
@@ -118,6 +118,7 @@ class Isotope {
 			this.fFactor.add(tempArray);
 		}
 		Collections.reverse(this.fFactor);
+		return i;
 	}
 	
 	void readChi(Vector<String> strings, int i){
@@ -176,24 +177,18 @@ class Isotope {
 	}
 	
 	void buildScatter(){
-		for(int i = 0; i < this.eBins; i++){
-			this.scatterXS.add(0.);
-		}
+		this.scatterXS = new double[this.eBins];
 		for(int i = 0; i < this.eBins; i++){
 			for(int j = 0; j < this.eBins; j++){
-				this.scatterXS.set(i, this.scatterXS.get(i) + this.sKernal.get(j).get(i).get(0));
+				this.scatterXS[i] += this.sKernal.get(j).get(i).get(0);
 			}
 		}
 	}
 	
 	void buildAbsorb(){
+		this.absorbXS = new double[this.eBins];
 		for(int i = 0; i < this.eBins; i++){
-			this.absorbXS.add(0.);
-		}
-		for(int i = 0; i < this.eBins; i++){
-			for(int j = 0; j < this.eBins; j++){
-				this.absorbXS.set(i, this.totalXS.get(i) - this.scatterXS.get(i));
-			}
+			this.absorbXS[i] = this.totalXS.get(i) - this.scatterXS[i];
 		}
 	}
 	

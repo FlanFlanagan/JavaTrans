@@ -1,47 +1,58 @@
 package javaTrans;
 
+import java.util.Arrays;
 import org.opensourcephysics.numerics.specialfunctions.Legendre;
 
 public class Constants {
-	int ordinates = 8;
+	int ordinates;
 	int dimensions = 1;
-	double convergence = 0.0001;
+	double convergence = 0.01;
 	int legendre = 9;
 	int edges = 3;
 	double source = 0.;
 	int eBins;
 	
 	
-	Double[] mew;
-	Double[] wew;
+	double[] mew;
+	double[] wew;
 	double minMew;
 	
-	Double[][] lgdr;
+	double[][] lgdr;
 	
-	Double[] mew2 = {0.5774, -0.5774};
-	Double[] wew2 = {1., 1.};
-	Double[] mew8 = {0.9603, 0.7967, 0.5255, 0.1834, -.01834, -0.5255, -0.7967, -0.9603};
-	Double[] wew8 = {0.1021 , 0.2224, 0.3137, 0.3627, 0.3627, 0.3137, 0.2224, 0.1021};
-	
-	Constants(){
+	Constants(int ordinates){
+		buildOrdinates(ordinates);
 		mewTest();
 		buildLgdr();
 	}
 	
-	void mewTest(){
-		if(ordinates == 2){
-			mew = mew2;
-			wew = wew2;
-			minMew = 0.5571;
-		} else {
-			mew = mew8;
-			wew = wew8;
-			minMew = 0.1834;
+	
+	void buildOrdinates(int l){
+		double[] tempMews = Legendre.getPolynomial(l).rootsReal();
+		Arrays.sort(tempMews);
+		double[] mews = new double[tempMews.length];
+		for(int i = 0; i < mews.length; i++){
+			mews[i] = tempMews[mews.length-1-i];
 		}
+		double[] wews = new double[mews.length];
+		for(int i = 0; i < mews.length; i++){
+			double legDer = Legendre.getPolynomial(l).derivative().evaluate(mews[i]);
+			double legMinus = Legendre.getPolynomial(l-1).evaluate(mews[i]);
+			wews[i] = 2 / (l * legMinus * legDer);
+		}
+		this.ordinates = mews.length;
+		this.mew = mews;
+		this.wew = wews;
+		/*for(int i = 0; i < this.mew.length; i++){
+			System.out.println(mew[i] + " "+ wew[i]);
+		}*/
+		
+	}
+	void mewTest(){
+		this.minMew = mew[this.ordinates/2-1];
 	}
 	
 	void buildLgdr(){
-		Double[][] tempArray = new Double[this.legendre][this.mew.length];
+		double[][] tempArray = new double[this.legendre][this.ordinates];
 		for(int l = 0; l < legendre; l++){
 			for(int m = 0, mew = this.mew.length; m < mew; m++){
 				tempArray[l][m] = Legendre.evaluate(l, this.mew[m]);
@@ -49,4 +60,27 @@ public class Constants {
 		}
 		this.lgdr = tempArray;
 	}
+	
+	/*void oridinateReader(){
+		double[] tempMew = new double[this.ordinates];
+		double[] tempWew = new double[this.ordinates];
+		Stream<String> lines = null;
+		try {
+			lines = Files.lines(Paths.get("Ordinates/" + this.ordinates + ".ord"), StandardCharsets.UTF_8);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		Vector<String> strings = new Vector<String>();
+		lines.forEach((line) -> strings.add(line));
+		for(int i = 0; i < strings.size(); i++){
+			strings.set(i, strings.get(i).trim().replaceAll("\\s+", " "));
+			String[] tempString = strings.get(i).split(" ");
+			tempMew[i] = Double.parseDouble(tempString[0]);
+			tempMew[this.ordinates-1-i] = Double.parseDouble(tempString[0])*-1;
+			tempWew[i] = Double.parseDouble(tempString[1]);
+			tempWew[this.ordinates-1-i] = Double.parseDouble(tempString[1]);
+		}
+		this.mew = tempMew;
+		this.wew = tempWew;
+	}*/
 }
