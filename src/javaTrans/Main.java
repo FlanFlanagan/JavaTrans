@@ -6,7 +6,7 @@ import java.util.Arrays;
 public class Main {
 	public static void main(String[] args){
 		double time1 = System.nanoTime();
-		Domain domain = new Domain(40);
+		Domain domain = new Domain(8);
 		double time2 = System.nanoTime();
 		System.out.println("Domain build time = " + (time2-time1)/1E9);
 		run(domain);
@@ -28,7 +28,7 @@ public class Main {
 	
 	static void run(Domain domain){
 		double time1 = System.nanoTime();
-		domain.runProblem();
+		domain.runProblemReflect();
 		double time2 = System.nanoTime();
 		System.out.println("Done. Finished run in: " + String.valueOf((time2-time1)/1E9) + " seconds");
 	}

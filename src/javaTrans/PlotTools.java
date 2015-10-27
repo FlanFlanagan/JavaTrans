@@ -54,11 +54,10 @@ public class PlotTools {
 		return maxFlux;
 	}
 	
-	static void printPolar(Mesh mesh, int energy, int edge){
+	static void printPolarCenter(Mesh mesh, int energy, int edge, String name){
 		double maxFlux = maxFluxCalc(mesh, edge);
 		XYSeries temp = new XYSeries(energy);
 		for(int m = 0, mew = mesh.region.conts.mew.length; m < mew; m++){
-			System.out.println(m + " " + Math.acos(mesh.region.conts.mew[m])*(360/(Math.PI*2)) + " " + mesh.fluxTArray[edge][0][m][energy]/maxFlux );
 			temp.add(Math.acos(mesh.region.conts.mew[m])*(360/(Math.PI*2)), mesh.fluxTArray[edge][0][m][energy]/maxFlux);
 		}
 		XYSeriesCollection data = new XYSeriesCollection();
@@ -72,7 +71,59 @@ public class PlotTools {
 		PolarPlot plot = (PolarPlot) polar.getPlot();
 		DefaultPolarItemRenderer render = (DefaultPolarItemRenderer) plot.getRenderer();
 		render.setSeriesFilled(2, true);
-		File XYChart = new File("ordinate.jpeg"); 
+		File XYChart = new File(name+".jpeg"); 
+		try {
+			ChartUtilities.saveChartAsJPEG(XYChart, polar, 2560, 1920);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	static void printPolarRight(Mesh mesh, int energy, int edge, String name){
+		double maxFlux = maxFluxCalc(mesh, 2);
+		XYSeries temp = new XYSeries(energy);
+		for(int m = 0, mew = mesh.region.conts.mew.length; m < mew; m++){
+			temp.add(Math.acos(mesh.region.conts.mew[m])*(360/(Math.PI*2)), mesh.fluxTArray[edge][0][m][energy]/maxFlux);
+		}
+		XYSeriesCollection data = new XYSeriesCollection();
+		data.addSeries(temp);
+		JFreeChart polar = ChartFactory.createPolarChart(
+				"Ordinate Fluxes",
+				data, 
+				true, 
+				true,
+				false);
+		PolarPlot plot = (PolarPlot) polar.getPlot();
+		DefaultPolarItemRenderer render = (DefaultPolarItemRenderer) plot.getRenderer();
+		render.setSeriesFilled(2, true);
+		File XYChart = new File(name+".jpeg"); 
+		try {
+			ChartUtilities.saveChartAsJPEG(XYChart, polar, 2560, 1920);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	static void printPolarLeft(Mesh mesh, int energy, int edge, String name){
+		double maxFlux = maxFluxCalc(mesh, 1);
+		XYSeries temp = new XYSeries(energy);
+		for(int m = 0, mew = mesh.region.conts.mew.length; m < mew; m++){
+			temp.add(Math.acos(mesh.region.conts.mew[m])*(360/(Math.PI*2)), mesh.fluxTArray[edge][0][m][energy]/maxFlux);
+		}
+		XYSeriesCollection data = new XYSeriesCollection();
+		data.addSeries(temp);
+		JFreeChart polar = ChartFactory.createPolarChart(
+				"Ordinate Fluxes",
+				data, 
+				true, 
+				true,
+				false);
+		PolarPlot plot = (PolarPlot) polar.getPlot();
+		DefaultPolarItemRenderer render = (DefaultPolarItemRenderer) plot.getRenderer();
+		render.setSeriesFilled(2, true);
+		File XYChart = new File(name+".jpeg"); 
 		try {
 			ChartUtilities.saveChartAsJPEG(XYChart, polar, 2560, 1920);
 		} catch (IOException e) {

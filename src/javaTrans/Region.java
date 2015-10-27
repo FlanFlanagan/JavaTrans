@@ -179,7 +179,7 @@ public class Region {
 		this.calcMaxXS();
 		this.calcMaxMesh();
 		this.calcMeshSize();
-		//this.meshSize = 0.4;
+		this.meshSize = 0.5;
 		this.calcMeshNumber();
 	}
 	
@@ -195,11 +195,6 @@ public class Region {
 		this.scatterXS = new double[conts.eBins];
 		this.chi = new double[conts.eBins];
 		this.finalFlux = new double[conts.eBins];
-		/*Arrays.fill(this.totalXS, 0);
-		Arrays.fill(this.absorbXS, 0);
-		Arrays.fill(this.scatterXS, 0);
-		Arrays.fill(this.chi, 0);
-		this.finalFlux.add(0.);*/
 		this.sKernalArray = new double[this.conts.eBins][this.conts.eBins][this.conts.legendre];
 	}
 
@@ -275,6 +270,14 @@ public class Region {
 		for(Mesh mesh: this.meshPoints){
 			mesh.setSource(0, 0, flux*Math.exp(-absorption*mesh.xPosition));
 			System.out.println(mesh.xPosition + ": " + mesh.sourceTArray[0][0][0]);
+		}
+	}
+	
+	void setVolIsoSource(double flux){
+		for(Mesh mesh: this.meshPoints){
+			for(int m = 0, mew = this.conts.mew.length; m < mew; m++){
+				mesh.setSource(m, 0, flux);
+			}
 		}
 	}
 }

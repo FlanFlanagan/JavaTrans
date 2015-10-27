@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class Domain {
+	String sourceType = "beam";
 	Constants conts;
 	ArrayList<Isotope> projectIsos = new ArrayList<Isotope>();
 	ArrayList<Region> regions = new ArrayList<Region>();
@@ -20,38 +21,31 @@ public class Domain {
 	}
 	
 	void runProblemReflect(){
-		for(Region reg: regions){
+		/*for(Region reg: regions){
 			for(Mesh mesh: reg.meshPoints){
 				mesh.setSource(0, 0, 100);
 			}
-		}
+		}*/
+		setSource(this.sourceType, 1000);
 		int count2 = 0;
-		while(count2 < 50){
+		while(convergenceTest(count2, 50)){
 			int count1 = 0;
-			while(count1 < 50){
+			while(convergenceTest(count1, 50)){
 				int count = 0;			
-				//while(convergenceTest(regions) != true || count == 0){
-				while(count < 50){
-					for(int i = 0; i < regions.size(); i++){
-						regions.get(i).sweepRight();
-						if(i < regions.size()-1){
-							regLeft(regions.get(i), regions.get(i+1));
-						}
-					}
+				while(convergenceTest(count, 50)){
+					sweepRight();
 					for(int m = 0, mew = conts.mew.length; m < mew/2; m++){
 						for(int e = 0; e < conts.eBins; e++){
 							regions.get(0).meshPoints.get(regions.get(0).meshNumber-1).fluxArray[2][0][mew-m-1][e] = regions.get(0).meshPoints.get(regions.get(0).meshNumber-1).fluxArray[2][0][m][e];
 						}
 					}
-					for(int i = regions.size()-1; i >= 0; i--){
-						regions.get(i).sweepLeft();
-						if(i > 0){
-							regRight(regions.get(i), regions.get(i-1));
-						}
+					if(count == 1 && count1==0){
+						setSource(this.sourceType, 0);
 					}
-					for(int m = 0, mew = conts.mew.length; m > mew/2; m--){
+					sweepLeft();
+					for(int m = conts.mew.length-1, mew = conts.mew.length; m >= mew/2; m--){
 						for(int e = 0; e < conts.eBins; e++){
-							regions.get(0).meshPoints.get(0).fluxArray[0][0][m][e] = regions.get(0).meshPoints.get(0).fluxArray[0][0][mew-m-1][e];
+							regions.get(0).meshPoints.get(0).fluxArray[0][0][mew-m-1][e] = regions.get(0).meshPoints.get(0).fluxArray[0][0][m][e];
 						}
 					}
 					count++;
@@ -71,39 +65,28 @@ public class Domain {
 			nufissionCalc();
 			criticalityCalc();
 			updateOldFission();
-			
+			System.out.println("count 2 " + count2);
 			count2++;
 		}
 		try {
 			PlotTools.printMeshPlots(regions, "JustG");
-			//PlotTools.printPolar(regions.get(1).meshPoints.get(regions.get(1).meshNumber-1), 9, 1);
+			PlotTools.printPolarCenter(regions.get(0).meshPoints.get(regions.get(0).meshNumber-1), 0, 1, "right");
+			PlotTools.printPolarCenter(regions.get(0).meshPoints.get(0), 0, 1, "left");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
-	
+	/**
+	 * 
+	 */
 	void runProblem(){
 		int count = 0;
-		//regions.get(0).setBeamSource(1000000);
-		regions.get(0).meshPoints.get(0).setFlux(0, 0, 0, 1000000);
-		//while(convergenceTest(regions) != true || count == 0){
-		while(count < 180){
-			for(int i = 0; i < regions.size(); i++){
-				regions.get(i).sweepLeft();
-				if(i < regions.size()-1){
-					regLeft(regions.get(i), regions.get(i+1));
-				}
-			}
-			for(int i = regions.size()-1; i >= 0; i--){
-				regions.get(i).sweepRight();
-				if(i > 0){
-					regRight(regions.get(i), regions.get(i-1));
-				}
-			}
-			for(int i = 0; i < regions.size(); i++){
-				regions.get(i).sourceCalc();
-			}
+		setSource(this.sourceType, 100000.);
+		while(convergenceTest(count, 180)){
+			sweepLeft();
+			sweepRight();
+			updateScatterSource();
 			regions.get(0).meshPoints.get(0).setFlux(0, 0, 0, 0);
 			count++;
 		}
@@ -115,7 +98,8 @@ public class Domain {
 		}
 		try {
 			PlotTools.printMeshPlots(regions, "JustG");
-			//PlotTools.printPolar(regions.get(1).meshPoints.get(regions.get(1).meshNumber-1), 9, 1);
+			PlotTools.printPolarCenter(regions.get(0).meshPoints.get(regions.get(0).meshNumber-1), 9, 1, "right");
+			PlotTools.printPolarCenter(regions.get(0).meshPoints.get(0), 9, 1, "left");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -139,13 +123,23 @@ public class Domain {
 		}	
 	}
 	
-	static boolean convergenceTest(ArrayList<Region> regions){
+	static boolean convergenceTest(ArrayList<Region> regions, int number){
+		if(number == 0){
+			return true;
+		}
 		for(Region reg: regions){
 			if(!reg.convergenceCheck()){
-				return false;
+				return true;
 			}
 		}
-		return true;
+		return false;
+	}
+	
+	static boolean convergenceTest(int number, int iterations){
+		if(number < iterations || number == 0){
+			return true;
+		}
+		return false;
 	}
 
 	void nufissionCalc(){
@@ -162,11 +156,12 @@ public class Domain {
 
 	void updateOldFission(){
 		this.oldFission = this.currentFission;
+		this.currentFission = 0;
 	}
 	
 	void criticalityCalc(){
 		this.criticality = this.oldCrit * (this.currentFission/this.oldFission);
-		System.out.println(this.criticality);
+		//System.out.println(this.criticality);
 	}
 	
 	boolean criticalityConvergence(){
@@ -179,7 +174,7 @@ public class Domain {
 	void leakageLeft(){
 		for(int m = this.conts.mew.length/2, mew = this.conts.mew.length; m < mew; m++){
 			for(int e = 0, eng = this.conts.eBins; e < eng; e++){
-				this.leakLeft = (0.5) * conts.wew[m] * conts.mew[m] * regions.get(0).meshPoints.get(0).fluxTArray[0][0][m][e];
+				this.leakLeft = (0.5) * conts.wew[m] * conts.mew[m] *this.regions.get(0).meshPoints.get(0).fluxTArray[0][0][m][e];
 			}
 		}
 	}
@@ -187,7 +182,7 @@ public class Domain {
 	void leakageRight(){
 		for(int m = 0, mew = this.conts.mew.length/2; m < mew; m++){
 			for(int e = 0, eng = this.conts.eBins; e < eng; e++){
-				this.leakRight = (0.5) * conts.wew[m] * conts.mew[m] * regions.get(regions.size()-1).meshPoints.get(regions.get(0).meshNumber-1).fluxTArray[2][0][m][e];
+				this.leakRight = (0.5) * conts.wew[m] * conts.mew[m] * this.regions.get(this.regions.size()-1).meshPoints.get(this.regions.get(0).meshNumber-1).fluxTArray[2][0][m][e];
 			}
 		}
 	}
@@ -199,8 +194,51 @@ public class Domain {
 	}
 	
 	void zeroTotalFlux(){
-		for(Region reg: regions){
+		for(Region reg: this.regions){
 			reg.zeroTotalFlux();
 		}
 	}
+	
+	void sweepLeft(){
+		for(int i = 0; i < this.regions.size(); i++){
+			this.regions.get(i).sweepLeft();
+			if(i < this.regions.size()-1){
+				regLeft(this.regions.get(i), this.regions.get(i+1));
+			}
+		}
+	}
+	
+	void sweepRight(){
+		for(int i = regions.size()-1; i >= 0; i--){
+			regions.get(i).sweepRight();
+			if(i > 0){
+				regRight(regions.get(i), regions.get(i-1));
+			}
+		}
+	}
+	
+	void updateScatterSource(){
+		for(int i = 0; i < regions.size(); i++){
+			regions.get(i).sourceCalc();
+		}
+	}
+	
+	void setSource(String sourceType, double flux){
+		switch(sourceType){
+		case "beam":
+			regions.get(0).meshPoints.get(0).setFlux(0, 0, 0, flux /*/ this.conts.wew[0]*/);
+			break;
+		case "beamAtten":
+			regions.get(0).setBeamSource(flux);
+			break;
+		case "volumeIso":
+			for(Region reg: this.regions){
+				reg.setVolIsoSource(100);
+			}
+		default:
+			System.out.println("Not a source type you dingus.");
+			break;
+		}
+	}
+	
 }
