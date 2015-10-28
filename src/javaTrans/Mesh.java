@@ -69,7 +69,7 @@ class Mesh {
 			for(int j = 0, ji = this.fluxTArray[i].length; j < ji; j++){
 				for(int k = 0, ki = this.fluxTArray[i][j].length; k < ki; k++){
 					for(int m = 0, mi = this.fluxTArray[i][j][k].length; m < mi; m++){
-						this.fluxArray[i][j][k][m] = 0.;
+						this.fluxTArray[i][j][k][m] = 0.;
 					}
 				}
 			}

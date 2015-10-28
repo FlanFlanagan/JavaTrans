@@ -215,7 +215,6 @@ public class Region {
 					if(m < meshPoints.size()-1){
 						this.meshPoints.get(m+1).setFlux(0, mew, e, this.meshPoints.get(m).fluxArray[2][0][mew][e]);
 					}	
-					this.meshPoints.get(m).sumTotal(1, mew, e);
 				}
 			}
 		}
@@ -230,7 +229,6 @@ public class Region {
 					if(m > 0){
 						this.meshPoints.get(m-1).setFlux(2, mew, e, this.meshPoints.get(m).fluxArray[0][0][mew][e]);
 					}	
-					this.meshPoints.get(m).sumTotal(1, mew, e);
 				}
 			}
 		}
@@ -238,6 +236,11 @@ public class Region {
 	
 	void sourceCalc(){
 		for(Mesh mesh: this.meshPoints){
+			for(int m = 0, mew = this.conts.mew.length; m < mew; m++){
+				for(int e = 0, eng = this.conts.eBins; e < eng; e++){
+					mesh.sumTotal(1, m, e);
+				}
+			}
 			mesh.zeroSource();
 			mesh.calcScatter(this.conts);
 		}
@@ -276,7 +279,20 @@ public class Region {
 	void setVolIsoSource(double flux){
 		for(Mesh mesh: this.meshPoints){
 			for(int m = 0, mew = this.conts.mew.length; m < mew; m++){
-				mesh.setSource(m, 0, flux);
+				for(int e = 0; e < this.conts.eBins; e++){
+					mesh.setSource(m, e, flux * this.conts.wew[m]);
+				}
+			}
+		}
+	}
+
+	public void setVolIsoFlux(double flux) {
+		for(Mesh mesh: this.meshPoints){
+			for(int m = 0, mew = this.conts.mew.length; m < mew; m++){
+				for(int e = 0; e < this.conts.eBins; e++){
+					mesh.setFlux(1, m, e, flux * this.conts.wew[m]);
+					mesh.sumTotal(1, m, e);
+				}
 			}
 		}
 	}

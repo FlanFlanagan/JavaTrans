@@ -11,7 +11,7 @@ public class Domain {
 	double criticality;
 	double oldCrit =1.;
     double currentFission = 0;
-    double oldFission = 10;
+    double oldFission;
     double leakRight = 0;
     double leakLeft = 0;
 
@@ -21,26 +21,27 @@ public class Domain {
 	}
 	
 	void runProblemReflect(){
-		/*for(Region reg: regions){
+		setSource("volumeIsoFlux", 15);
+		nufissionCalc();
+		updateOldFission();
+		for(Region reg: this.regions){
 			for(Mesh mesh: reg.meshPoints){
-				mesh.setSource(0, 0, 100);
+				mesh.sumTotalEFlux(this.conts);
+				mesh.sumTotalFlux();
+				mesh.calcFissionSource(this.conts);
 			}
-		}*/
-		setSource(this.sourceType, 1000);
+		}
 		int count2 = 0;
-		while(convergenceTest(count2, 50)){
+		while(convergenceTest(count2, 20)){
 			int count1 = 0;
-			while(convergenceTest(count1, 50)){
+			while(convergenceTest(count1, 150)){
 				int count = 0;			
-				while(convergenceTest(count, 50)){
+				while(convergenceTest(count, 10)){
 					sweepRight();
 					for(int m = 0, mew = conts.mew.length; m < mew/2; m++){
 						for(int e = 0; e < conts.eBins; e++){
 							regions.get(0).meshPoints.get(regions.get(0).meshNumber-1).fluxArray[2][0][mew-m-1][e] = regions.get(0).meshPoints.get(regions.get(0).meshNumber-1).fluxArray[2][0][m][e];
 						}
-					}
-					if(count == 1 && count1==0){
-						setSource(this.sourceType, 0);
 					}
 					sweepLeft();
 					for(int m = conts.mew.length-1, mew = conts.mew.length; m >= mew/2; m--){
@@ -55,27 +56,32 @@ public class Domain {
 				}
 				count1++;
 			}
-			for(Region reg: regions){
+			for(Region reg: this.regions){
 				for(Mesh mesh: reg.meshPoints){
 					mesh.sumTotalEFlux(conts);
-					mesh.sumTotalFlux();
+					//mesh.sumTotalFlux();
 					mesh.calcFissionSource(conts);
 				}
 			}
 			nufissionCalc();
 			criticalityCalc();
 			updateOldFission();
-			System.out.println("count 2 " + count2);
+			updateOldCrit();
+			zeroTotalFlux();
+			//System.out.println("count 2 " + count2);
 			count2++;
 		}
-		try {
+		for(int i = 0; i < conts.eBins; i++){
+			System.out.println(this.regions.get(0).meshPoints.get(0).energyFlux[i]);
+		}
+		/*try {
 			PlotTools.printMeshPlots(regions, "JustG");
 			PlotTools.printPolarCenter(regions.get(0).meshPoints.get(regions.get(0).meshNumber-1), 0, 1, "right");
 			PlotTools.printPolarCenter(regions.get(0).meshPoints.get(0), 0, 1, "left");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		}*/
 	}
 	/**
 	 * 
@@ -93,7 +99,7 @@ public class Domain {
 		for(Region reg: regions){
 			for(Mesh mesh: reg.meshPoints){
 				mesh.sumTotalEFlux(reg.conts);
-				mesh.sumTotalFlux();
+				//mesh.sumTotalFlux();
 			}
 		}
 		try {
@@ -159,9 +165,18 @@ public class Domain {
 		this.currentFission = 0;
 	}
 	
+	void updateOldCrit(){
+		this.oldCrit = this.criticality;
+		this.criticality = 0;
+	}
+	
 	void criticalityCalc(){
+		System.out.println(this.currentFission + " " + this.oldFission);
 		this.criticality = this.oldCrit * (this.currentFission/this.oldFission);
-		//System.out.println(this.criticality);
+		for(Region reg: this.regions){
+			reg.criticality = this.criticality;
+		}
+		System.out.println(this.criticality);
 	}
 	
 	boolean criticalityConvergence(){
@@ -231,10 +246,16 @@ public class Domain {
 		case "beamAtten":
 			regions.get(0).setBeamSource(flux);
 			break;
-		case "volumeIso":
+		case "volumeIsoSource":
 			for(Region reg: this.regions){
 				reg.setVolIsoSource(100);
 			}
+			break;
+		case "volumeIsoFlux":
+			for(Region reg: this.regions){
+				reg.setVolIsoFlux(100);
+			}
+			break;
 		default:
 			System.out.println("Not a source type you dingus.");
 			break;
