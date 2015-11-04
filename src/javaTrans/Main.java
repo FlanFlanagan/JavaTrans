@@ -28,8 +28,8 @@ public class Main {
 	
 	static void run(Domain domain){
 		double time1 = System.nanoTime();
-		domain.runProblemReflect();
-		//domain.runProblem();
+		//domain.runProblemReflect();
+		domain.runProblem();
 		double time2 = System.nanoTime();
 		System.out.println("Done. Finished run in: " + String.valueOf((time2-time1)/1E9) + " seconds");
 	}

@@ -68,7 +68,6 @@ public class Domain {
 			updateOldFission();
 			updateOldCrit();
 			zeroTotalFlux();
-			//System.out.println("count 2 " + count2);
 			count2++;
 		}
 		for(int i = 0; i < conts.eBins; i++){
@@ -99,7 +98,6 @@ public class Domain {
 		for(Region reg: regions){
 			for(Mesh mesh: reg.meshPoints){
 				mesh.sumTotalEFlux(reg.conts);
-				//mesh.sumTotalFlux();
 			}
 		}
 		try {

@@ -179,7 +179,7 @@ public class Region {
 		this.calcMaxXS();
 		this.calcMaxMesh();
 		this.calcMeshSize();
-		this.meshSize = 0.5;
+		//this.meshSize = 0.5;
 		this.calcMeshNumber();
 	}
 	
@@ -208,12 +208,12 @@ public class Region {
 	
 	void sweepRight(){
 		for(int m = 0; m < this.meshNumber; m++){
-			for(int mew = 0; mew < this.conts.mew.length/2; mew++){
-				for(int e = 0; e < this.conts.eBins; e++){
-					this.meshPoints.get(m).calcFluxCenterXR(mew, e, this.conts);
-					this.meshPoints.get(m).calcFluxRightX(mew, e, this.conts);
+			for(int mew_i = 0, mew = this.conts.mew.length/2; mew_i< mew; mew_i++){
+				for(int e = 0, eng = this.conts.eBins; e < eng; e++){
+					this.meshPoints.get(m).calcFluxCenterXR(mew_i, e, this.conts);
+					this.meshPoints.get(m).calcFluxRightX(mew_i, e, this.conts);
 					if(m < meshPoints.size()-1){
-						this.meshPoints.get(m+1).setFlux(0, mew, e, this.meshPoints.get(m).fluxArray[2][0][mew][e]);
+						this.meshPoints.get(m+1).setFlux(0, mew_i, e, this.meshPoints.get(m).fluxArray[2][0][mew_i][e]);
 					}	
 				}
 			}
@@ -222,12 +222,12 @@ public class Region {
 	
 	void sweepLeft(){
 		for(int m = this.meshNumber-1; m >= 0; m--){
-			for(int mew = this.conts.mew.length/2; mew < this.conts.mew.length; mew++){
-				for(int e = 0; e < this.conts.eBins; e++){
-					this.meshPoints.get(m).calcFluxCenterXL(mew, e, this.conts);
-					this.meshPoints.get(m).calcFluxLeftX(mew, e, this.conts);
+			for(int mew_i = this.conts.mew.length/2, mew = this.conts.mew.length; mew_i < mew; mew_i++){
+				for(int e = 0, eng = this.conts.eBins; e < eng; e++){
+					this.meshPoints.get(m).calcFluxCenterXL(mew_i, e, this.conts);
+					this.meshPoints.get(m).calcFluxLeftX(mew_i, e, this.conts);
 					if(m > 0){
-						this.meshPoints.get(m-1).setFlux(2, mew, e, this.meshPoints.get(m).fluxArray[0][0][mew][e]);
+						this.meshPoints.get(m-1).setFlux(2, mew_i, e, this.meshPoints.get(m).fluxArray[0][0][mew_i][e]);
 					}	
 				}
 			}

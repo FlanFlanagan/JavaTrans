@@ -194,7 +194,6 @@ class Mesh {
 	
 	void sumTotalFlux(){
 		this.finalFlux = Arrays.stream(this.energyFlux).sum();
-		//System.out.println(this.xPosition + " : " + total);
 	}
 	
 	
