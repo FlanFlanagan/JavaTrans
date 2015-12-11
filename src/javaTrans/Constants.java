@@ -6,7 +6,7 @@ import org.opensourcephysics.numerics.specialfunctions.Legendre;
 public class Constants {
 	int ordinates;
 	int dimensions = 1;
-	double convergence = 0.001;
+	double convergence = 0.0005;
 	int legendre = 9;
 	int edges = 3;
 	double source = 0.;

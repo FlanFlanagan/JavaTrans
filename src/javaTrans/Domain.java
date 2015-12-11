@@ -88,7 +88,7 @@ public class Domain {
 	void runProblem(){
 		int count = 0;
 		setSource(this.sourceType, 100000.);
-		while(convergenceTest(count, 180)){
+		while(convergenceTest(this.regions, count)){
 			sweepLeft();
 			sweepRight();
 			updateScatterSource();

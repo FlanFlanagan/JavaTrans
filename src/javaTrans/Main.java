@@ -9,12 +9,12 @@ public class Main {
 		Domain domain = new Domain(8);
 		double time2 = System.nanoTime();
 		System.out.println("Domain build time = " + (time2-time1)/1E9);
-		run(domain);
-		//speedTest(domain);
+		//run(domain);
+		speedTest(domain);
 	}
 	
 	static void speedTest(Domain domain){
-		double[] time = new double[50];
+		double[] time = new double[20];
 		int count = 0;
 		while(count < time.length){
 			double time1 = System.nanoTime();
@@ -24,6 +24,10 @@ public class Main {
 			count++;
 		}
 		System.out.println("Done. Finished " + count + " runs. Average run time was " + Arrays.stream(time).average().getAsDouble());
+		System.out.println("Test results");
+		for(int i = 0; i < count; i++){
+			System.out.println(i + ":" + time[i]);
+		}
 	}
 	
 	static void run(Domain domain){

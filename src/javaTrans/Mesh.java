@@ -41,7 +41,7 @@ class Mesh {
 		this.region = region;
 	}
 	
-	double[][][][] flux2Array(Constants conts/*ArrayList<ArrayList<ArrayList<ArrayList<Double>>>> arrayList*/){
+	double[][][][] flux2Array(Constants conts){
 		double[][][][] tempArray = new double[conts.edges][conts.dimensions][conts.ordinates][conts.eBins];
 		return tempArray;
 	}

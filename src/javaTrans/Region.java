@@ -179,7 +179,7 @@ public class Region {
 		this.calcMaxXS();
 		this.calcMaxMesh();
 		this.calcMeshSize();
-		//this.meshSize = 0.5;
+		this.meshSize = 0.05;
 		this.calcMeshNumber();
 	}
 	
@@ -242,9 +242,9 @@ public class Region {
 				}
 			}
 			mesh.zeroSource();
-			mesh.calcScatter(this.conts);
+			//mesh.calcScatter(this.conts);
 		}
-		
+		this.meshPoints.parallelStream().forEach((mesh) -> mesh.calcScatter(conts));
 	}
 	
 	void zeroFlux(){
