@@ -120,6 +120,9 @@ class Mesh {
 				phiL = calcPhiL(conts, l, e);
 				for(int e2 = 0; e2 < conts.eBins; e2++){
 					skernal = this.region.sKernalArray[e2][e][l];
+					if(skernal == 0){
+						continue;
+					}
 					for(int m2 = 0, mew = conts.mew.length; m2 < mew; m2++){
 						this.sourceTArray[0][m2][e2] += lValue * conts.lgdr[l][m2] * skernal * phiL;
 					}
